@@ -1,0 +1,2337 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>簿記二級 稽古帳</title>
+<meta name="description" content="日商簿記2級（商業簿記・工業簿記）の論点をアニメーション図解で学び、仕訳と計算の入力式テストで確かめる学習教材">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@500;600&family=Shippori+Mincho+B1:wght@600;800&display=swap">
+<style>
+/* Layout: 3級と同じ帳簿の罫線紙。上段で商業／工業／テストを切り替え、下段で章を選ぶ。借方＝藍・貸方＝朱は全体で固定 */
+:root{
+  --paper:#ECF1EC; --sheet:#FAFCF8; --ink:#1C2530; --ink-2:#56646B; --rule:#BCCEC2; --rule-2:#8FAE9A;
+  --accent:#245C4B; --on-accent:#F4FAF6; --debit:#2B4C94; --credit:#B5432C; --ok:#3B7A2A; --ng:#A3304F; --hl:#F2E6A6;
+  --ok-tint:#D6EACB; --ng-tint:#F3D3DB;
+  --e-asset:#DCE5F4; --e-exp:#E4E0F2; --e-liab:#F5E0D8; --e-eq:#F1E5CC; --e-rev:#F4DAE0; --e-pl:#DCEED6; --e-line:#9FB0A6;
+  --s1:#2F6F9F; --s2:#C27A12; --s3:#8A4FA0;
+  --shadow:rgb(28 37 48 / .16);
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#131A17; --sheet:#1B2420; --ink:#E3EAE5; --ink-2:#9BAAA2; --rule:#33443B; --rule-2:#4E6A5B;
+    --accent:#7CC3A6; --on-accent:#0F1A15; --debit:#94ABEA; --credit:#F08B72; --ok:#93CF7E; --ng:#F17E9C; --hl:#5A4F1E;
+    --ok-tint:#29402A; --ng-tint:#4A2632;
+    --e-asset:#24314B; --e-exp:#2E2A47; --e-liab:#472F28; --e-eq:#433822; --e-rev:#482A33; --e-pl:#243F28; --e-line:#4C5E55;
+    --s1:#7FB3E0; --s2:#E7AE55; --s3:#C597D6;
+    --shadow:rgb(0 0 0 / .45); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131A17; --sheet:#1B2420; --ink:#E3EAE5; --ink-2:#9BAAA2; --rule:#33443B; --rule-2:#4E6A5B;
+  --accent:#7CC3A6; --on-accent:#0F1A15; --debit:#94ABEA; --credit:#F08B72; --ok:#93CF7E; --ng:#F17E9C; --hl:#5A4F1E;
+  --ok-tint:#29402A; --ng-tint:#4A2632;
+  --e-asset:#24314B; --e-exp:#2E2A47; --e-liab:#472F28; --e-eq:#433822; --e-rev:#482A33; --e-pl:#243F28; --e-line:#4C5E55;
+  --s1:#7FB3E0; --s2:#E7AE55; --s3:#C597D6;
+  --shadow:rgb(0 0 0 / .45); color-scheme:dark;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.8 var(--f-body);-webkit-text-size-adjust:100%}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;line-height:1.35;margin:0}
+p{margin:0}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-weight:500;letter-spacing:-.01em}
+.dr{color:var(--debit)} .cr{color:var(--credit)} .okc{color:var(--ok)} .ngc{color:var(--ng)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+a{color:var(--accent)}
+
+/* masthead */
+.masthead{padding-block:28px 18px;position:relative}
+.masthead::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to bottom,transparent 0 27px,var(--rule) 27px 28px);opacity:.55;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 40%);mask-image:linear-gradient(to right,transparent,#000 40%)}
+.masthead-in{position:relative;display:flex;flex-wrap:wrap;gap:14px 32px;align-items:flex-end;justify-content:space-between}
+.masthead h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:.04em}
+.masthead h1 small{display:block;font:700 12px/1.6 var(--f-body);letter-spacing:.18em;color:var(--ink-2);margin-bottom:4px}
+.lead{max-width:36em;color:var(--ink-2);font-size:14px;margin-top:8px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:13px;align-items:center}
+.legend span{border:1.5px solid currentColor;border-radius:3px;padding:1px 10px;background:var(--sheet);font-weight:700}
+.legend a{font-size:13px;font-weight:700}
+
+/* nav */
+.chapters{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--rule-2)}
+.nav-top{display:flex;gap:16px;align-items:center;padding-top:8px}
+.parts{display:inline-flex;border:1.5px solid var(--accent);border-radius:5px;overflow:hidden;flex:0 0 auto}
+.parts button{border:0;background:transparent;padding:4px 14px;font-weight:700;font-size:13.5px;cursor:pointer;color:var(--accent)}
+.parts button+button{border-left:1.5px solid var(--accent)}
+.parts button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.nav-in{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nav-in::-webkit-scrollbar{display:none}
+.nav-in button{flex:0 0 auto;border:0;background:none;padding:10px 12px 8px;cursor:pointer;color:var(--ink-2);font-weight:700;font-size:14px;border-bottom:3px solid transparent;white-space:nowrap}
+.nav-in button b{font-family:var(--f-display);font-size:15px;margin-right:5px}
+.nav-in button[aria-current="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.nav-in button[aria-current="true"] b{color:var(--accent)}
+.nav-in button:hover{color:var(--ink)}
+
+main{padding-block:28px 72px}
+.chapter{display:grid;gap:30px}
+.ch-head{display:grid;gap:8px;padding-bottom:12px;border-bottom:4px double var(--rule-2)}
+.ch-head .eyebrow{font-size:12px;letter-spacing:.16em;color:var(--accent);font-weight:700}
+.ch-head h2{font-size:clamp(24px,3.6vw,30px);font-weight:800}
+.ch-head p{max-width:44em;color:var(--ink-2)}
+.block{display:grid;gap:14px;min-width:0}
+.block>h3{font-size:19px;font-weight:800}
+.block>p,.prose{max-width:46em}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:20px;min-width:0}
+.stack{display:grid;gap:14px}
+.note{font-size:13.5px;color:var(--ink-2)}
+.mark{font-weight:700;background:var(--hl);padding:0 4px;border-radius:2px;color:var(--ink)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--accent);background:var(--accent);color:var(--on-accent);border-radius:4px;padding:7px 15px;font-weight:700;font-size:14px;cursor:pointer;line-height:1.5}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.sm{padding:2px 10px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:not(:disabled):hover{filter:brightness(1.08)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.controls .step-label{margin-left:auto;font-size:13px;color:var(--ink-2)}
+.caption-live{font-size:14px;min-height:1.8em;font-weight:700;color:var(--accent)}
+
+.picker{display:flex;flex-wrap:wrap;gap:6px}
+.picker button{border:1px solid var(--rule-2);background:var(--sheet);border-radius:3px;padding:5px 10px;font-size:13px;cursor:pointer}
+.picker button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);font-weight:700}
+
+.form-row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}
+.form-row label{display:grid;gap:2px;font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.form-row input,.form-row select{border:1px solid var(--rule-2);border-radius:4px;padding:5px 8px;background:var(--sheet);font-family:var(--f-num);width:9em;color:var(--ink)}
+.form-row input.short{width:6em}
+.form-row select{font-family:var(--f-body)}
+.err{color:var(--ng);font-size:13px;font-weight:700;min-height:1.5em}
+
+.two{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:780px){.two{grid-template-columns:1fr}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.cards>div,.cards>button{border:1px solid var(--rule);background:var(--sheet);border-radius:5px;padding:12px 14px;display:grid;gap:6px;align-content:start;text-align:left;min-width:0}
+.cards h4{font-size:15px;font-weight:800}
+.cards p{font-size:13.5px;color:var(--ink-2)}
+.cards>button{cursor:pointer}
+.cards>button:hover{border-color:var(--accent)}
+.cards>button small{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.08em}
+.ent{font-size:13px;display:flex;flex-wrap:wrap;gap:2px 12px}
+.ent .dr::before{content:"(借) ";font-size:11px} .ent .cr::before{content:"(貸) ";font-size:11px}
+
+/* tables */
+.jt{border-collapse:collapse;width:100%;min-width:380px;font-size:14px;background:var(--sheet)}
+.jt th{font-size:12px;font-weight:700;padding:4px 8px;border-bottom:1.5px solid var(--ink);text-align:left;white-space:nowrap}
+.jt td{padding:5px 8px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.jt td.n,.jt th.n{text-align:right}
+.jt tr.active td{background:var(--hl)}
+.dt{border-collapse:collapse;font-size:13.5px;background:var(--sheet);width:100%;min-width:420px}
+.dt th,.dt td{padding:5px 10px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+.dt th{font-size:12px;border-bottom:1.5px solid var(--ink)}
+.dt td:first-child,.dt th:first-child{text-align:left}
+.dt td.l,.dt th.l{text-align:left;white-space:normal}
+.dt tr.total td{border-top:2px solid var(--ink);font-weight:700}
+.dt td.pop{animation:pop .5s ease}
+.dt tr.hot td{background:var(--hl)}
+@keyframes pop{0%{background:var(--hl)}100%{background:transparent}}
+
+/* flow widget */
+.stage-tx{font-size:16px;line-height:2;font-weight:700}
+.stage-tx .part{border-bottom:2px dotted var(--rule-2);padding:1px 2px;transition:background .3s}
+.stage-tx .part.on-dr{background:color-mix(in srgb,var(--debit) 18%,transparent);border-bottom-color:var(--debit)}
+.stage-tx .part.on-cr{background:color-mix(in srgb,var(--credit) 18%,transparent);border-bottom-color:var(--credit)}
+.board{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--ink);background:var(--sheet)}
+.board>div{min-height:110px;padding:8px 10px;display:grid;align-content:start;gap:6px;min-width:0}
+.board>div+div{border-left:2px solid var(--ink)}
+.board h4{font-size:13px;letter-spacing:.08em;font-family:var(--f-body)}
+.board .tot{border-top:1px solid var(--rule);font-size:13px;padding-top:4px;display:flex;justify-content:space-between;min-height:1.8em}
+.chip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 10px;border:1.5px solid currentColor;border-radius:4px;padding:4px 8px;background:var(--paper);animation:ink .45s ease}
+.chip b{color:var(--ink);overflow-wrap:anywhere}
+.chip small{grid-column:1/-1;font-size:11.5px;color:var(--ink-2)}
+@media (max-width:520px){.chip{grid-template-columns:1fr}.chip .num{justify-self:end}}
+@keyframes ink{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+
+/* T accounts */
+.tacct{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:8px 10px 6px;min-width:0;transition:opacity .5s,box-shadow .4s}
+.tacct.glow{box-shadow:0 0 0 3px var(--accent)}
+.tacct.dim{opacity:.35}
+.tname{text-align:center;font-family:var(--f-display);font-weight:800;border-bottom:2px solid var(--ink);padding-bottom:3px;font-size:15px}
+.tbody{display:grid;grid-template-columns:1fr 1fr;min-height:70px}
+.tbody>ul{list-style:none;margin:0;padding:4px 5px;font-size:12px;display:grid;align-content:start;gap:2px;min-width:0}
+.tbody>ul:first-child{border-right:2px solid var(--ink)}
+.tbody li{display:flex;justify-content:space-between;gap:4px;animation:ink .45s ease;flex-wrap:wrap}
+.tbody li span:first-child{color:var(--ink-2)}
+.tbal{font-size:12px;text-align:center;min-height:1.7em;border-top:1px solid var(--rule);margin-top:2px;padding-top:2px}
+.tbal.on{font-weight:700}
+
+/* flyer */
+.flyer{position:fixed;z-index:60;pointer-events:none;background:var(--sheet);border:1.5px solid currentColor;border-radius:4px;padding:2px 9px;font:600 13px/1.5 var(--f-num);box-shadow:0 8px 20px var(--shadow);white-space:nowrap;color:var(--ink)}
+.flyer.dr{color:var(--debit)} .flyer.cr{color:var(--credit)} .flyer.ok{color:var(--accent)}
+
+/* svg charts */
+svg.chart{width:100%;height:auto;display:block;overflow:visible}
+svg .ax{fill:var(--ink-2);font:11px var(--f-body)}
+svg .axn{fill:var(--ink-2);font:11px var(--f-num)}
+svg .lbl{fill:var(--ink);font:700 12px var(--f-body)}
+svg .lbln{fill:var(--ink);font:600 12px var(--f-num)}
+svg .gl{stroke:var(--rule);stroke-width:1}
+svg .base{stroke:var(--ink);stroke-width:1.5}
+svg .dash{stroke:var(--ink-2);stroke-width:1;stroke-dasharray:4 4}
+svg .draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
+svg .draw.on{stroke-dashoffset:0}
+svg .fade{opacity:0;transition:opacity .5s}
+svg .fade.on{opacity:1}
+svg .grow{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);transition:transform .7s cubic-bezier(.4,0,.2,1)}
+svg .grow.on{transform:scaleY(1)}
+svg .growx{transform-box:fill-box;transform-origin:0 50%;transform:scaleX(0);transition:transform .8s cubic-bezier(.4,0,.2,1)}
+svg .growx.on{transform:scaleX(1)}
+.c-s1{fill:var(--s1)} .c-s2{fill:var(--s2)} .c-s3{fill:var(--s3)}
+.st-s1{stroke:var(--s1)} .st-s2{stroke:var(--s2)} .st-s3{stroke:var(--s3)}
+.keys{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
+.keys i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.vlist{display:grid;gap:4px;font-size:14px}
+.vlist div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--rule);padding:3px 0}
+.vlist div.tot{border-top:1.5px solid var(--ink);border-bottom:0;font-weight:700}
+.tag{font-size:11.5px;font-weight:700;border-radius:3px;padding:0 6px;border:1px solid currentColor;margin-left:6px}
+
+/* inventory diagram */
+.inv-wrap{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;gap:4px 8px}
+.inv-y{position:relative;width:82px;font-size:11.5px;color:var(--ink-2)}
+.inv-y span,.inv-x span{position:absolute;white-space:nowrap;font-family:var(--f-num)}
+.inv-y span{right:0;transform:translateY(50%)}
+.inv{position:relative;height:230px;border-left:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+.inv-x{grid-column:2;position:relative;height:18px;font-size:11.5px;color:var(--ink-2)}
+.inv-x span{transform:translateX(-50%)}
+.rg{position:absolute;background:var(--e-asset);border:1.5px solid var(--sheet);display:grid;place-content:center;text-align:center;font-size:12px;line-height:1.35;transition:background .6s,transform .6s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.rg span{opacity:0;transition:opacity .4s;padding:2px}
+.rg.show span{opacity:1}
+.rg.c-loss{background:var(--e-exp);transform:translateX(8px)}
+.rg.c-val{background:var(--e-liab);transform:translateY(-8px)}
+.rg.c-bs{background:var(--e-pl)}
+
+/* bars and gauges */
+.seg-bar{display:flex;height:42px;border:1.5px solid var(--ink);background:var(--sheet);border-radius:2px;overflow:hidden}
+.seg-bar>div{flex:1 1 0;border-right:1px dashed var(--rule-2);display:grid;place-content:center;font-size:11.5px;color:var(--ink-2);transition:background .4s}
+.seg-bar>div:last-child{border-right:0}
+.seg-bar>div.on{background:var(--e-pl);color:var(--ink);font-weight:700}
+.gauge{position:relative;height:46px;border:1.5px solid var(--ink);background:var(--sheet);border-radius:2px;margin-top:26px}
+.gauge>div{position:absolute;top:0;bottom:0;transition:left .8s,width .8s cubic-bezier(.4,0,.2,1)}
+.g-a{background:var(--e-eq);left:0}
+.g-b{background:repeating-linear-gradient(-45deg,var(--e-pl) 0 6px,var(--e-eq) 6px 10px);border-left:1.5px solid var(--accent)}
+.g-x{background:repeating-linear-gradient(-45deg,transparent 0 5px,var(--ng-tint) 5px 9px);border:1.5px dashed var(--ng);opacity:0;transition:opacity .5s!important}
+.g-x.on{opacity:1}
+.g-lim{border-left:2.5px solid var(--credit);width:0}
+.g-lim span{position:absolute;top:-24px;left:0;transform:translateX(-50%);font-size:11.5px;font-weight:700;color:var(--credit);white-space:nowrap}
+
+/* 3-step cards (foreign currency etc.) */
+.steps3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.steps3{grid-template-columns:1fr}}
+.stepcard{border:1px solid var(--rule);background:var(--sheet);border-radius:5px;padding:12px;display:grid;gap:8px;align-content:start;opacity:.28;transition:opacity .5s,box-shadow .4s;min-width:0}
+.stepcard.on{opacity:1}
+.stepcard.cur{box-shadow:0 0 0 2px var(--accent)}
+.stepcard .d{font-size:12px;font-weight:700;color:var(--ink-2);letter-spacing:.06em}
+.stepcard .rate{font-family:var(--f-num);font-size:22px;font-weight:600}
+.stepcard .jt{min-width:0;font-size:12.5px}
+.stepcard .jt td{padding:3px 4px;white-space:normal}
+
+/* mini P/L */
+.pl{display:grid;font-size:14px;border:1.5px solid var(--ink);background:var(--sheet)}
+.pl>div{display:flex;justify-content:space-between;gap:10px;padding:6px 12px;border-bottom:1px solid var(--rule);transition:background .5s,opacity .5s}
+.pl>div:last-child{border-bottom:0}
+.pl>div.sum{font-weight:700;border-top:1.5px solid var(--ink)}
+.pl>div.new{background:var(--hl)}
+.pl>div.off{opacity:.25}
+.pl small{color:var(--ink-2);font-size:12px}
+
+/* consolidation */
+.cons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:end}
+.cons-col{display:grid;gap:6px;min-width:0}
+.cons-col h4{font-size:13.5px;text-align:center;font-family:var(--f-body)}
+.cons-stack{height:240px;display:flex;flex-direction:column;justify-content:flex-end;border-bottom:2px solid var(--ink);position:relative}
+.cb{border:1.5px solid var(--e-line);display:grid;place-content:center;text-align:center;font-size:12px;line-height:1.35;transition:height .7s cubic-bezier(.4,0,.2,1),opacity .5s,background .5s;overflow:hidden;flex:0 0 auto}
+.cb+.cb{margin-top:-1px}
+.cb.inv{background:var(--e-asset)} .cb.cap{background:var(--e-eq)} .cb.re{background:var(--e-eq)}
+.cb.pshare{background:var(--e-pl)} .cb.nci{background:var(--e-liab)} .cb.gw{background:var(--e-exp)} .cb.ngw{background:var(--e-rev)}
+.cb.ghost{opacity:0}
+.cons-col.off{opacity:.25}
+.stamp{position:absolute;inset:auto 0 40% 0;margin:auto;width:max-content;font:800 20px var(--f-display);color:var(--credit);border:2.5px solid var(--credit);padding:2px 12px;border-radius:4px;transform:rotate(-8deg) scale(1.4);opacity:0;transition:opacity .4s,transform .4s;background:color-mix(in srgb,var(--sheet) 70%,transparent)}
+.stamp.on{opacity:1;transform:rotate(-8deg) scale(1)}
+
+/* cost flow map */
+.flowmap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"mat oh fg" "lab wip cogs" "exp wip .";gap:12px}
+@media (max-width:700px){.flowmap{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"mat lab" "exp oh" "wip wip" "fg cogs"}}
+.flowmap>[data-a="材料"]{grid-area:mat} .flowmap>[data-a="賃金"]{grid-area:lab} .flowmap>[data-a="経費"]{grid-area:exp}
+.flowmap>[data-a="製造間接費"]{grid-area:oh} .flowmap>[data-a="仕掛品"]{grid-area:wip} .flowmap>[data-a="製品"]{grid-area:fg} .flowmap>[data-a="売上原価"]{grid-area:cogs}
+
+/* lots */
+.shelf{display:flex;height:56px;border:1.5px solid var(--ink);background:var(--sheet);border-radius:2px;overflow:hidden;position:relative}
+.lot{height:100%;display:grid;place-content:center;text-align:center;font-size:11.5px;line-height:1.3;border-right:1.5px solid var(--sheet);transition:width .7s cubic-bezier(.4,0,.2,1),background .4s;overflow:hidden;white-space:nowrap;flex:0 0 auto}
+.lot.a{background:var(--e-asset)} .lot.b{background:var(--e-eq)} .lot.c{background:var(--e-rev)} .lot.m{background:var(--e-pl)}
+.lot.take{background:var(--hl)!important}
+.scale-note{font-size:11.5px;color:var(--ink-2);display:flex;justify-content:space-between}
+
+/* dept table */
+.dept td.n,.dept th.n{min-width:86px}
+.dept td.src{background:color-mix(in srgb,var(--hl) 70%,transparent)}
+
+/* job order */
+.dest{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dest>div{border:1.5px dashed var(--rule-2);border-radius:5px;padding:8px 10px;min-height:76px;display:grid;align-content:start;gap:4px;background:var(--sheet);min-width:0}
+.dest h4{font-size:13px;font-family:var(--f-body);color:var(--ink-2)}
+.badge{display:inline-flex;gap:8px;justify-content:space-between;border:1.5px solid var(--accent);border-radius:4px;padding:2px 8px;font-size:12.5px;animation:ink .45s ease;background:var(--paper)}
+
+/* process box */
+.pbox-wrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:640px){.pbox-wrap{grid-template-columns:1fr}}
+.pbox{display:grid;gap:6px}
+.pbox h4{font-size:14px;font-family:var(--f-body)}
+.pbox-in{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--ink);height:230px;background:var(--sheet)}
+.pcol{display:flex;flex-direction:column;min-width:0}
+.pcol+.pcol{border-left:2px solid var(--ink)}
+.pc{flex:1 1 0;min-height:40px;display:grid;place-content:center;text-align:center;font-size:12px;line-height:1.4;border-bottom:1px solid var(--rule-2);transition:background .4s,box-shadow .4s;padding:2px}
+.pc:last-child{border-bottom:0}
+.pc .num{font-size:12.5px}
+.pc.lit{background:var(--hl);box-shadow:inset 0 0 0 2px var(--accent)}
+.pc .v{opacity:0;transition:opacity .4s}
+.pc .v.on{opacity:1}
+
+/* absorption vs variable */
+.cmp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:640px){.cmp{grid-template-columns:1fr}}
+.fohbar{display:flex;height:34px;border:1.5px solid var(--ink);border-radius:2px;overflow:hidden;background:var(--sheet)}
+.fohbar>div{display:grid;place-content:center;font-size:11.5px;transition:flex-grow .8s cubic-bezier(.4,0,.2,1),background .5s;white-space:nowrap;overflow:hidden}
+
+/* subtabs */
+.subtabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--rule-2)}
+.subtabs button{border:1px solid transparent;border-bottom:0;background:none;padding:7px 14px;cursor:pointer;font-weight:700;font-size:14px;color:var(--ink-2);border-radius:4px 4px 0 0;margin-bottom:-1px}
+.subtabs button[aria-selected="true"]{background:var(--sheet);border-color:var(--rule-2);color:var(--ink)}
+
+/* exam table */
+.exam{border-collapse:collapse;width:100%;min-width:520px;background:var(--sheet);font-size:14px}
+.exam th,.exam td{border-bottom:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+.exam th{font-size:12px;border-bottom:1.5px solid var(--ink)}
+.exam td.n{text-align:right;white-space:nowrap}
+.exam td:first-child{white-space:nowrap;font-weight:700}
+.exam .k{color:var(--s1)} .exam .c{color:var(--s2)}
+
+/* test */
+.t-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start}
+@media (max-width:760px){.t-top{grid-template-columns:1fr}}
+.stats{display:grid;gap:7px}
+.stat{display:grid;grid-template-columns:9.5em minmax(0,1fr) 4.2em;gap:10px;align-items:center;font-size:13px}
+.stat .track{height:9px;background:var(--paper);border:1px solid var(--rule-2);border-radius:5px;overflow:hidden}
+.stat .fill{display:block;height:100%;background:var(--accent);transition:width .6s}
+.stat .v{text-align:right;color:var(--ink-2)}
+.q-card{display:grid;gap:16px}
+.q-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:12.5px;color:var(--ink-2);font-weight:700}
+.q-progress{height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
+.q-progress div{height:100%;background:var(--accent);transition:width .4s}
+.q-text{font-size:16.5px;font-weight:700;line-height:1.9}
+.q-hint{font-size:12.5px;color:var(--ink-2)}
+.je{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--ink);background:var(--sheet)}
+@media (max-width:600px){.je{grid-template-columns:1fr}.je-side+.je-side{border-left:0!important;border-top:2px solid var(--ink)}}
+.je-side{padding:8px 10px 10px;display:grid;gap:6px;min-width:0}
+.je-side+.je-side{border-left:2px solid var(--ink)}
+.je-h,.je-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 1.4em;gap:6px;align-items:center}
+.je-h{font-size:12px;font-weight:700}
+.je-row select,.je-row input{width:100%;min-width:0;border:1px solid var(--rule-2);border-radius:3px;padding:6px 6px;background:var(--paper);font-size:14px}
+.je-row input{font-family:var(--f-num);text-align:right}
+.je-row .mk{font-weight:800;text-align:center}
+.je-side.dr .je-h{color:var(--debit)} .je-side.cr .je-h{color:var(--credit)}
+.calc-in{display:flex;align-items:center;gap:8px}
+.calc-in input{width:12em;border:1px solid var(--rule-2);border-radius:4px;padding:8px 10px;background:var(--sheet);font-family:var(--f-num);font-size:16px;text-align:right}
+.result{border-top:4px double var(--rule-2);padding-top:14px;display:grid;gap:10px}
+.result .big{font-family:var(--f-display);font-size:22px;font-weight:800}
+.result .big.ok,.mk.ok{color:var(--ok)} .result .big.ng,.mk.ng{color:var(--ng)}
+.final{display:grid;gap:14px}
+.final .score{font-family:var(--f-display);font-size:44px;font-weight:800;line-height:1.1}
+.final ul{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:13.5px}
+.final li{display:grid;grid-template-columns:1.6em minmax(0,1fr);gap:6px}
+footer{border-top:1px solid var(--rule-2);padding-block:18px 28px;font-size:12.5px;color:var(--ink-2)}
+footer p+p{margin-top:4px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <div>
+      <h1><small>日商簿記 2級 ・ 商業簿記／工業簿記</small>簿記二級 稽古帳</h1>
+      <p class="lead">図が動くのを見て論点の仕組みをつかみ、仕訳と計算を自分で入力して確かめる教材です。左側（借方）は藍、右側（貸方）は朱。数字を書き換えられる図は、書き換えて「再生」すると計算し直します。</p>
+    </div>
+    <div class="legend" aria-label="色の凡例"><span class="dr">借方＝左</span><span class="cr">貸方＝右</span><a href="https://samsreeds.github.io/boki3/" target="_blank" rel="noopener">3級の稽古帳へ ↗</a></div>
+  </div>
+</header>
+
+<nav class="chapters" aria-label="章">
+  <div class="wrap nav-top">
+    <div class="parts" id="parts" role="group" aria-label="分野"></div>
+  </div>
+  <div class="wrap nav-in" id="nav-ch"></div>
+</nav>
+
+<main class="wrap">
+
+<!-- ================= 商業 0 全体像 ================= -->
+<section class="chapter" id="c0" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">商業簿記 ・ 序</span>
+    <h2>2級の全体像</h2>
+    <p>2級は、株式会社の会計を扱う「商業簿記」と、製造業の原価計算を扱う「工業簿記」の2本立てです。3級で覚えた仕訳のルールはそのまま使います。</p>
+  </div>
+  <div class="block">
+    <h3>試験の構成</h3>
+    <div class="scroll-x"><table class="exam">
+      <thead><tr><th>大問</th><th>分野</th><th>主な内容</th><th style="text-align:right">配点</th></tr></thead>
+      <tbody>
+        <tr><td>第1問</td><td class="c">商業簿記</td><td>仕訳 5問</td><td class="n num">20点</td></tr>
+        <tr><td>第2問</td><td class="c">商業簿記</td><td>連結会計、有価証券、固定資産、株主資本等変動計算書などの個別問題</td><td class="n num">20点</td></tr>
+        <tr><td>第3問</td><td class="c">商業簿記</td><td>決算整理を含む損益計算書・貸借対照表の作成、本支店会計など</td><td class="n num">20点</td></tr>
+        <tr><td>第4問</td><td class="k">工業簿記</td><td>(1) 仕訳 3問　(2) 費目別・部門別・個別・総合原価計算など</td><td class="n num">28点</td></tr>
+        <tr><td>第5問</td><td class="k">工業簿記</td><td>標準原価計算、直接原価計算、CVP分析</td><td class="n num">12点</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">試験時間は90分、70点以上で合格です。配点は近年の出題の目安で、回によって変わることがあります。</p>
+  </div>
+  <div class="block">
+    <h3>学習の地図</h3>
+    <p class="note">カードを押すとその章へ移動します。おすすめは、商業簿記の章を順に読み、工業簿記は「原価の流れ」から始める順番です。</p>
+    <div class="cards" id="map-cards"></div>
+  </div>
+  <div class="block">
+    <h3>3級からの主な違い</h3>
+    <div class="cards">
+      <div><h4>売上原価対立法</h4><p>商品を「商品」勘定で記録し、売るたびに売上原価を計上する方法が加わります。三分法との違いを第一章で確認します。</p></div>
+      <div><h4>収益認識基準</h4><p>契約資産・契約負債・返金負債など、売上を計上するタイミングと金額のルールが細かくなります。</p></div>
+      <div><h4>会社全体の会計</h4><p>税効果会計、本支店会計、親会社と子会社をまとめる連結会計が出題されます。</p></div>
+      <div><h4>工業簿記</h4><p>材料・労働・経費から製品の原価を計算します。商業簿記とは別の考え方なので、図で流れをつかむのが近道です。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 商業 1 商品売買・収益認識 ================= -->
+<section class="chapter" id="c1" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">商業簿記 ・ 第一章</span>
+    <h2>商品売買と収益認識</h2>
+    <p>2級では、三分法に加えて売上原価対立法を使います。期末の棚卸減耗損・商品評価損の計算と、収益認識基準による売上の計上も第3問の決算整理でよく出ます。</p>
+  </div>
+  <div class="block">
+    <h3>売上原価対立法</h3>
+    <p>仕入れた商品は「商品」（資産）で記録し、売り上げるたびに、その原価を「商品」から「売上原価」（費用）へ移します。期末に「しーくりくりしー」の決算整理は不要です。</p>
+    <div class="flow" data-flow="taiku"></div>
+  </div>
+  <div class="block">
+    <h3>棚卸減耗損と商品評価損</h3>
+    <p>帳簿上の在庫（帳簿棚卸高）と実際の在庫を比べて、数が足りない分を<b>棚卸減耗損</b>、時価（正味売却価額）が原価より下がった分を<b>商品評価損</b>として費用にします。図の横は数量、縦は単価です。</p>
+    <div class="form-row">
+      <label>原価（@円）<input id="inv-cost" inputmode="numeric" value="1,000"></label>
+      <label>正味売却価額（@円）<input id="inv-nrv" inputmode="numeric" value="800"></label>
+      <label>帳簿数量（個）<input id="inv-bq" inputmode="numeric" value="200"></label>
+      <label>実地数量（個）<input id="inv-aq" inputmode="numeric" value="170"></label>
+      <button class="btn" id="inv-play">再生</button>
+    </div>
+    <p class="err" id="inv-err"></p>
+    <div class="sheet two">
+      <div class="stack">
+        <div class="inv-wrap">
+          <div class="inv-y" id="inv-y"></div>
+          <div class="inv" id="inv"></div>
+          <div class="inv-x" id="inv-x"></div>
+        </div>
+        <p class="caption-live" id="inv-cap"></p>
+      </div>
+      <div class="stack">
+        <div class="vlist" id="inv-list"></div>
+        <div class="scroll-x" id="inv-jt"></div>
+        <p class="note">先に減耗（数量の不足）を原価で計算し、残った実地数量について評価損を計算します。順番を逆にすると金額が変わるので注意。</p>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>収益認識基準</h3>
+    <p>「約束したモノやサービスを相手に引き渡したとき」に売上を計上します。代金をまだ請求できない権利は<b>契約資産</b>、先に受け取った対価は<b>契約負債</b>、返金が見込まれる分は<b>返金負債</b>です。</p>
+    <div class="flow" data-flow="rev"></div>
+  </div>
+</section>
+
+<!-- ================= 商業 2 有価証券 ================= -->
+<section class="chapter" id="c2" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">商業簿記 ・ 第二章</span>
+    <h2>有価証券</h2>
+    <p>持つ目的によって4つに分け、それぞれ期末の評価方法が違います。分類と、評価差額がP/Lに行くのかB/Sの純資産に行くのかを押さえます。</p>
+  </div>
+  <div class="block">
+    <h3>4つの分類</h3>
+    <div class="scroll-x"><table class="dt">
+      <thead><tr><th>分類</th><th class="l">目的</th><th class="l">期末の評価</th><th class="l">評価差額の行き先</th></tr></thead>
+      <tbody>
+        <tr><td><b>売買目的有価証券</b></td><td class="l">時価の変動で利益を得る</td><td class="l">時価</td><td class="l">有価証券評価損益（P/L）</td></tr>
+        <tr><td><b>満期保有目的債券</b></td><td class="l">満期まで持って利息を得る</td><td class="l">取得原価（差額は償却原価法）</td><td class="l">有価証券利息（P/L）</td></tr>
+        <tr><td><b>子会社株式・関連会社株式</b></td><td class="l">他社を支配する・影響力を持つ</td><td class="l">取得原価</td><td class="l">なし</td></tr>
+        <tr><td><b>その他有価証券</b></td><td class="l">上のどれにも当たらない（持ち合い株など）</td><td class="l">時価</td><td class="l">その他有価証券評価差額金（B/S純資産）</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">その他有価証券の評価替えは、翌期首に逆の仕訳で元に戻します（洗替法）。売買目的有価証券は切放法と洗替法のどちらも出題されます。</p>
+  </div>
+  <div class="block">
+    <h3>償却原価法（満期保有目的債券）</h3>
+    <p>額面より安く（高く）買った債券は、その差額を満期までの期間に配分して、毎期の帳簿価額を額面に近づけます。配分額は有価証券利息になります。</p>
+    <div class="form-row">
+      <label>額面金額<input id="am-face" inputmode="numeric" value="1,000,000"></label>
+      <label>取得価額<input id="am-cost" inputmode="numeric" value="970,000"></label>
+      <label>満期までの年数<input id="am-years" class="short" inputmode="numeric" value="5"></label>
+      <button class="btn" id="am-play">再生</button>
+    </div>
+    <p class="err" id="am-err"></p>
+    <div class="sheet stack">
+      <p class="note" id="am-head"></p>
+      <div class="seg-bar" id="am-bar"></div>
+      <p class="caption-live" id="am-cap"></p>
+      <div class="two">
+        <div class="scroll-x"><table class="dt" id="am-table"></table></div>
+        <div class="scroll-x" id="am-jt"></div>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>取引の仕訳</h3>
+    <div class="flow" data-flow="sec"></div>
+  </div>
+</section>
+
+<!-- ================= 商業 3 固定資産 ================= -->
+<section class="chapter" id="c3" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">商業簿記 ・ 第三章</span>
+    <h2>固定資産とリース</h2>
+    <p>減価償却の方法が3つになり、買換え・除却・圧縮記帳・リース・ソフトウェアなど、固定資産をめぐる取引が広く出題されます。</p>
+  </div>
+  <div class="block">
+    <h3>減価償却の3つの方法</h3>
+    <p>取得原価 1,000,000円、残存価額ゼロ、耐用年数5年の機械で比べます。生産高比例法は、総利用可能量 100,000km のうち各年に使った距離で配分します。</p>
+    <div class="sheet stack">
+      <svg class="chart" id="dep3" viewBox="0 0 640 270" role="img" aria-label="3つの減価償却方法の年ごとの減価償却費"></svg>
+      <div class="keys"><span><i style="background:var(--s1)"></i>定額法</span><span><i style="background:var(--s2)"></i>200%定率法</span><span><i style="background:var(--s3)"></i>生産高比例法</span></div>
+      <div class="controls"><button class="btn ghost" id="dep3-play">もう一度再生</button></div>
+      <div class="scroll-x"><table class="dt" id="dep3-table"></table></div>
+      <p class="note">200%定率法の償却率は 1÷5年×2＝0.4。4年目は 216,000×0.4＝86,400 が償却保証額 108,000（1,000,000×保証率0.108）を下回るため、改定償却率 0.5 に切り替えて 216,000×0.5＝108,000 を毎年償却します。最終年度は備忘価額1円を残すのが税法の扱いです。</p>
+    </div>
+  </div>
+  <div class="block">
+    <h3>取引の仕訳</h3>
+    <div class="flow" data-flow="fa"></div>
+  </div>
+</section>
+
+<!-- ================= 商業 4 外貨・税効果・引当金 ================= -->
+<section class="chapter" id="c4" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">商業簿記 ・ 第四章</span>
+    <h2>外貨建取引・税効果会計・引当金</h2>
+    <p>為替レートの変化で円の金額が動く外貨建取引と、会計上の利益と税金の計算のずれを調整する税効果会計は、どちらも「タイミングの違い」を扱う論点です。</p>
+  </div>
+  <div class="block">
+    <h3>外貨建取引：$1,000 の輸入</h3>
+    <p>取引日・決算日・決済日の3時点でレートが変わります。買掛金のような貨幣項目は決算日のレート（CR）で換算し直し、差額は<b>為替差損益</b>にします。</p>
+    <div class="steps3" id="fx-cards"></div>
+    <p class="caption-live" id="fx-cap"></p>
+    <div class="controls"><button class="btn ghost" id="fx-prev">◀ 戻る</button><button class="btn" id="fx-next">次へ ▶</button><span class="step-label" id="fx-step"></span></div>
+    <p class="note">前払金・前受金は、すでに円で支払った（受け取った）金額が確定しているので、決算日に換算替えしません。為替予約を付けた場合は、予約レートで換算し、以後は換算替えしません（振当処理）。</p>
+  </div>
+  <div class="block">
+    <h3>税効果会計</h3>
+    <p>税法で費用と認められない額（損金不算入）があると、税金は高くなりますが、その差は将来の税金が減る形で戻ってきます。その「前払いした税金」を<b>繰延税金資産</b>として計上し、P/Lの税金費用を利益に見合った額に直します。</p>
+    <div class="form-row">
+      <label>税引前当期純利益<input id="tx-pi" inputmode="numeric" value="100,000"></label>
+      <label>損金不算入額（一時差異）<input id="tx-add" inputmode="numeric" value="10,000"></label>
+      <label>実効税率（%）<input id="tx-rate" class="short" inputmode="decimal" value="30"></label>
+      <button class="btn" id="tx-play">再生</button>
+    </div>
+    <p class="err" id="tx-err"></p>
+    <div class="sheet two">
+      <div class="stack">
+        <svg class="chart" id="tx-bars" viewBox="0 0 420 120" role="img" aria-label="会計上の利益と課税所得の比較"></svg>
+        <p class="caption-live" id="tx-cap"></p>
+        <div class="scroll-x" id="tx-jt"></div>
+      </div>
+      <div class="pl" id="tx-pl"></div>
+    </div>
+    <p class="note">その他有価証券の評価差額に税効果を適用するときは、P/Lを通らないので法人税等調整額は使わず、評価差額金から直接差し引きます（例：時価の上昇100のうち30を繰延税金負債、70を評価差額金）。</p>
+  </div>
+  <div class="block">
+    <h3>引当金</h3>
+    <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr))">
+      <div><h4>貸倒引当金（個別評価）</h4><p>特定の債権だけ回収が危ぶまれるときは、その債権ごとに設定率を変えて計算します。</p><p class="ent"><span class="dr">貸倒引当金繰入</span><span class="cr">貸倒引当金</span></p></div>
+      <div><h4>修繕引当金</h4><p>次期に行う修繕のうち、当期の使用による分を見積もって計上します。</p><p class="ent"><span class="dr">修繕引当金繰入</span><span class="cr">修繕引当金</span></p></div>
+      <div><h4>賞与引当金</h4><p>次期に支払う賞与のうち、当期の勤務に対応する分。支給時は引当金を取り崩し、超過分は賞与で処理します。</p><p class="ent"><span class="dr">賞与引当金繰入</span><span class="cr">賞与引当金</span></p></div>
+      <div><h4>退職給付引当金</h4><p>将来の退職金のうち当期に発生した分。支払時は引当金を取り崩します。</p><p class="ent"><span class="dr">退職給付費用</span><span class="cr">退職給付引当金</span></p></div>
+      <div><h4>商品保証引当金</h4><p>無料で修理する保証について、将来の修理費を見積もります。有償の延長保証は契約負債として扱います。</p><p class="ent"><span class="dr">商品保証引当金繰入</span><span class="cr">商品保証引当金</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 商業 5 純資産・本支店 ================= -->
+<section class="chapter" id="c5" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">商業簿記 ・ 第五章</span>
+    <h2>純資産と本支店会計</h2>
+    <p>株式会社の純資産の動き（増資・配当・合併）と、本店と支店で別々に帳簿をつける本支店会計を扱います。</p>
+  </div>
+  <div class="block">
+    <h3>剰余金の配当と準備金の積立て</h3>
+    <p>配当をするときは、配当額の <b>1/10</b> を準備金として積み立てます。ただし、資本準備金と利益準備金の合計が資本金の <b>1/4</b> に達するまでで止まります。2つを比べて少ないほうが積立額です。</p>
+    <div class="form-row">
+      <label>資本金<input id="dv-cap" inputmode="numeric" value="10,000,000"></label>
+      <label>資本準備金<input id="dv-cr" inputmode="numeric" value="1,500,000"></label>
+      <label>利益準備金<input id="dv-rr" inputmode="numeric" value="900,000"></label>
+      <label>配当額<input id="dv-div" inputmode="numeric" value="1,500,000"></label>
+      <button class="btn" id="dv-play">再生</button>
+    </div>
+    <p class="err" id="dv-err"></p>
+    <div class="sheet stack">
+      <div class="gauge" id="dv-gauge"><div class="g-a" id="dv-a"></div><div class="g-b" id="dv-b"></div><div class="g-x" id="dv-x"></div><div class="g-lim" id="dv-lim"><span id="dv-limlabel"></span></div></div>
+      <div class="keys"><span><i style="background:var(--e-eq)"></i>いまの準備金（資本準備金＋利益準備金）</span><span><i style="background:var(--e-pl)"></i>配当額の1/10</span><span><i style="background:var(--credit)"></i>上限（資本金の1/4）</span></div>
+      <p class="caption-live" id="dv-cap"></p>
+      <div class="scroll-x" id="dv-jt"></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>本支店会計：照合勘定</h3>
+    <p>本店は「支店」勘定、支店は「本店」勘定で、お互いとの取引を記録します。2つの残高は必ず同じ額で貸借が逆になり、合併財務諸表を作るときに相殺して消します。</p>
+    <div class="sheet stack">
+      <p class="stage-tx" id="hb-text" style="font-size:15.5px"></p>
+      <div class="two">
+        <div class="stack"><h4 style="font-size:14px">本店の帳簿</h4><div class="scroll-x" id="hb-jh"></div><div id="hb-th"></div></div>
+        <div class="stack"><h4 style="font-size:14px">支店の帳簿</h4><div class="scroll-x" id="hb-jb"></div><div id="hb-tb"></div></div>
+      </div>
+      <p class="caption-live" id="hb-cap"></p>
+      <div class="controls"><button class="btn ghost" id="hb-prev">◀ 戻る</button><button class="btn" id="hb-next">次の取引 ▶</button><button class="btn ghost" id="hb-reset">最初から</button><span class="step-label" id="hb-step"></span></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>取引の仕訳</h3>
+    <div class="flow" data-flow="eq"></div>
+  </div>
+</section>
+
+<!-- ================= 商業 6 連結 ================= -->
+<section class="chapter" id="c6" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">商業簿記 ・ 第六章</span>
+    <h2>連結会計</h2>
+    <p>親会社（P社）と子会社（S社）の財務諸表を合算し、グループ内の取引を消して、ひとつの会社のような財務諸表を作ります。第2問の中心です。</p>
+  </div>
+  <div class="block">
+    <h3>投資と資本の相殺消去（支配獲得日）</h3>
+    <p>P社が持つ「子会社株式」と、S社の純資産のうちP社の持分を相殺します。P社の持分でない部分は<b>非支配株主持分</b>、投資額と持分の差額は<b>のれん</b>になります。</p>
+    <div class="form-row">
+      <label>子会社株式の取得原価<input id="cs-cost" inputmode="numeric" value="400,000"></label>
+      <label>P社の持分比率（%）<input id="cs-ratio" class="short" inputmode="decimal" value="80"></label>
+      <label>S社 資本金<input id="cs-cap" inputmode="numeric" value="300,000"></label>
+      <label>S社 利益剰余金<input id="cs-re" inputmode="numeric" value="150,000"></label>
+      <button class="btn" id="cs-play">再生</button>
+    </div>
+    <p class="err" id="cs-err"></p>
+    <div class="sheet stack">
+      <div class="cons">
+        <div class="cons-col" id="cs-colP"><h4>P社の投資</h4><div class="cons-stack" id="cs-P"></div></div>
+        <div class="cons-col" id="cs-colS"><h4>S社の資本</h4><div class="cons-stack" id="cs-S"></div></div>
+        <div class="cons-col" id="cs-colN"><h4>非支配株主持分</h4><div class="cons-stack" id="cs-N"></div></div>
+      </div>
+      <p class="caption-live" id="cs-cap"></p>
+      <div class="scroll-x" id="cs-jt"></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>支配獲得後の連結修正仕訳</h3>
+    <p>支配獲得日の翌年度からは、まず前年度までの修正を「開始仕訳」として繰り返し、その上で当年度の修正をします。下の例は、上の図の数字（のれん 40,000、持分80%）の1年後です。</p>
+    <div class="flow" data-flow="cons"></div>
+    <p class="note">開始仕訳では、前年度までの利益剰余金の修正を「利益剰余金当期首残高」、非支配株主持分の修正を「非支配株主持分当期首残高」で書くのが試験の書き方です。</p>
+  </div>
+</section>
+
+<!-- ================= 工業 1 原価の流れ ================= -->
+<section class="chapter" id="k1" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">工業簿記 ・ 第一章</span>
+    <h2>原価の流れ</h2>
+    <p>工業簿記は、材料・労働・経費が製品に変わっていく流れを勘定で追いかけます。製品に直接結びつく原価（直接費）は仕掛品へ、結びつかない原価（間接費）はいったん製造間接費に集めてから仕掛品へ配ります。</p>
+  </div>
+  <div class="block">
+    <div class="sheet stack">
+      <div class="scroll-x"><table class="jt" id="cf-journal"></table></div>
+      <p class="caption-live" id="cf-cap"></p>
+      <div class="flowmap" id="cf-map"></div>
+      <div class="controls"><button class="btn ghost" id="cf-prev">◀ 戻る</button><button class="btn" id="cf-next">次の仕訳 ▶</button><button class="btn ghost" id="cf-reset">最初から</button><button class="btn ghost" id="cf-all">最後まで再生</button><span class="step-label" id="cf-step"></span></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>原価の分類</h3>
+    <div class="scroll-x"><table class="dt">
+      <thead><tr><th></th><th class="l">直接費（仕掛品へ）</th><th class="l">間接費（製造間接費へ）</th></tr></thead>
+      <tbody>
+        <tr><td><b>材料費</b></td><td class="l">主要材料費（素材費）、買入部品費</td><td class="l">補助材料費、工場消耗品費、消耗工具器具備品費</td></tr>
+        <tr><td><b>労務費</b></td><td class="l">直接工の直接作業分の賃金</td><td class="l">直接工の間接作業・手待時間分、間接工賃金、給料、法定福利費</td></tr>
+        <tr><td><b>経費</b></td><td class="l">外注加工賃、特許権使用料</td><td class="l">減価償却費、電力料、保険料、修繕費、棚卸減耗費など</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">本社と工場で帳簿を分ける本社工場会計では、工場は「本社」勘定、本社は「工場」勘定を使い、本支店会計と同じように照合します。</p>
+  </div>
+</section>
+
+<!-- ================= 工業 2 材料費・労務費 ================= -->
+<section class="chapter" id="k2" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">工業簿記 ・ 第二章</span>
+    <h2>材料費と労務費</h2>
+    <p>同じ材料でも買った時期で単価が違うので、どの単価で払い出すかを決める必要があります。先入先出法と平均法（移動平均法）の違いを、棚の在庫で見てみましょう。</p>
+  </div>
+  <div class="block">
+    <h3>材料の払出単価</h3>
+    <div class="picker" id="lot-method"><button type="button" data-m="fifo" aria-pressed="true">先入先出法</button><button type="button" data-m="avg" aria-pressed="false">移動平均法</button></div>
+    <div class="sheet stack">
+      <p class="stage-tx" id="lot-text" style="font-size:15.5px"></p>
+      <div class="shelf" id="lot-shelf"></div>
+      <div class="scale-note"><span>棚の幅＝在庫の数量</span><span id="lot-total"></span></div>
+      <p class="caption-live" id="lot-cap"></p>
+      <div class="scroll-x"><table class="dt" id="lot-table"></table></div>
+      <div class="controls"><button class="btn ghost" id="lot-prev">◀ 戻る</button><button class="btn" id="lot-next">次へ ▶</button><button class="btn ghost" id="lot-reset">最初から</button><span class="step-label" id="lot-step"></span></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>予定価格・予定賃率と差異</h3>
+    <p>実際の単価は月末までわからないので、あらかじめ決めた予定価格（予定賃率）で消費額を計算します。実際との差は<b>材料消費価格差異</b>・<b>賃率差異</b>になります。実際のほうが高いと借方差異（不利差異）です。</p>
+    <div class="flow" data-flow="mat"></div>
+    <p class="note">賃金の消費額＝当月支払高 − 前月未払高 ＋ 当月未払高。支払った額ではなく、当月働いた分の額が当月の労務費です。</p>
+  </div>
+</section>
+
+<!-- ================= 工業 3 製造間接費・部門別 ================= -->
+<section class="chapter" id="k3" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">工業簿記 ・ 第三章</span>
+    <h2>製造間接費と部門別計算</h2>
+    <p>製造間接費は予定配賦率で製品に配り、実際発生額との差を<b>予算差異</b>と<b>操業度差異</b>に分けて分析します。図はシュラッター図と呼ばれる形です。</p>
+  </div>
+  <div class="block">
+    <h3>配賦差異の分析（公式法変動予算）</h3>
+    <div id="oh-widget"></div>
+  </div>
+  <div class="block">
+    <h3>部門別計算：補助部門費の配賦</h3>
+    <p>動力部・修繕部のような補助部門の費用を、製造部門（切削部・組立部）へ配ります。<b>直接配賦法</b>は補助部門どうしのやりとりを無視し、<b>相互配賦法（簡便法）</b>は1回目だけ補助部門どうしにも配ります。</p>
+    <div class="picker" id="dp-method"><button type="button" data-m="direct" aria-pressed="true">直接配賦法</button><button type="button" data-m="recip" aria-pressed="false">相互配賦法（簡便法）</button></div>
+    <div class="sheet stack">
+      <div class="scroll-x"><table class="dt" id="dp-ratio"></table></div>
+      <div class="scroll-x"><table class="dt dept" id="dp-table"></table></div>
+      <p class="caption-live" id="dp-cap"></p>
+      <div class="controls"><button class="btn ghost" id="dp-play">もう一度再生</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 工業 4 個別・総合 ================= -->
+<section class="chapter" id="k4" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">工業簿記 ・ 第四章</span>
+    <h2>個別原価計算と総合原価計算</h2>
+    <p>注文ごとに違う製品を作るなら個別原価計算、同じ製品を大量に作り続けるなら総合原価計算です。</p>
+  </div>
+  <div class="block">
+    <h3>個別原価計算：製造指図書ごとの集計</h3>
+    <p>注文ごとに製造指図書を発行し、原価を集計します。月末の状態で行き先が決まります。製造間接費は直接作業時間 × 予定配賦率 @1,000円 で配賦します。</p>
+    <div class="sheet stack">
+      <div class="scroll-x"><table class="dt" id="jo-table"></table></div>
+      <div class="dest" id="jo-dest"><div data-d="wip"><h4>仕掛品（月末）</h4></div><div data-d="fg"><h4>製品（月末）</h4></div><div data-d="cogs"><h4>売上原価</h4></div></div>
+      <p class="caption-live" id="jo-cap"></p>
+      <div class="controls"><button class="btn ghost" id="jo-play">もう一度再生</button></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>総合原価計算：ボックス図</h3>
+    <p>月初仕掛品 200個（加工進捗度50%）、当月投入 1,000個、完成品 1,000個、月末仕掛品 200個（加工進捗度40%）。材料は工程の始点で全部投入するので、仕掛品も完成品と同じ1個分の材料費を持ちます。加工費は進み具合に応じた<b>完成品換算量</b>で配分します。</p>
+    <div class="picker" id="pc-method"><button type="button" data-m="avg" aria-pressed="true">平均法</button><button type="button" data-m="fifo" aria-pressed="false">先入先出法</button></div>
+    <div class="sheet stack">
+      <div class="pbox-wrap" id="pc-boxes"></div>
+      <p class="caption-live" id="pc-cap"></p>
+      <div class="vlist" id="pc-sum"></div>
+      <div class="controls"><button class="btn ghost" id="pc-play">もう一度再生</button></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>総合原価計算のバリエーション</h3>
+    <div class="cards">
+      <div><h4>仕損・減損（度外視法）</h4><p>正常な仕損・減損の原価は、発生点を通過した製品が負担します。終点で発生 → 完成品だけが負担。始点で発生 → 完成品と月末仕掛品の両方が負担。</p></div>
+      <div><h4>工程別総合原価計算</h4><p>第1工程の完成品原価を「前工程費」として第2工程の始点に投入し、材料費と同じ扱いで計算します。</p></div>
+      <div><h4>組別総合原価計算</h4><p>A製品・B製品のように種類の違う製品を作るとき、組直接費は各組へ、組間接費は配賦基準で配ってから、組ごとに計算します。</p></div>
+      <div><h4>等級別総合原価計算</h4><p>サイズ違いなど同じ種類の製品は、等価係数で積数を求め、完成品原価をまとめて按分します。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 工業 5 標準原価 ================= -->
+<section class="chapter" id="k5" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">工業簿記 ・ 第五章</span>
+    <h2>標準原価計算と差異分析</h2>
+    <p>あらかじめ「1個あたりこれだけでできるはず」という標準原価を決めておき、実際とのズレを原因別に分けます。第5問の定番です。</p>
+  </div>
+  <div class="block">
+    <h3>標準原価カード（製品1個あたり）</h3>
+    <div class="scroll-x"><table class="dt">
+      <thead><tr><th></th><th>標準価格・配賦率</th><th>標準消費量</th><th>金額</th></tr></thead>
+      <tbody>
+        <tr><td>直接材料費</td><td class="num">@100円</td><td class="num">5kg</td><td class="num">500</td></tr>
+        <tr><td>直接労務費</td><td class="num">@1,200円</td><td class="num">2時間</td><td class="num">2,400</td></tr>
+        <tr><td>製造間接費</td><td class="num">@1,500円</td><td class="num">2時間</td><td class="num">3,000</td></tr>
+        <tr class="total"><td>合計</td><td></td><td></td><td class="num">5,900</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">当月の生産 500個（月初・月末仕掛品なし）。製造間接費は公式法変動予算：変動費率 @600、固定費予算 990,000円、基準操業度 1,100時間。</p>
+  </div>
+  <div class="subtabs" role="tablist" id="sv-tabs">
+    <button role="tab" data-v="mat" aria-selected="true">直接材料費</button>
+    <button role="tab" data-v="lab" aria-selected="false">直接労務費</button>
+    <button role="tab" data-v="oh" aria-selected="false">製造間接費</button>
+  </div>
+  <div class="block" id="sv-rect">
+    <div class="form-row">
+      <label><span id="sv-l1">標準価格</span><input id="sv-sp" inputmode="numeric"></label>
+      <label><span id="sv-l2">標準消費量</span><input id="sv-sq" inputmode="numeric"></label>
+      <label><span id="sv-l3">実際価格</span><input id="sv-ap" inputmode="numeric"></label>
+      <label><span id="sv-l4">実際消費量</span><input id="sv-aq" inputmode="numeric"></label>
+      <button class="btn" id="sv-play">再生</button>
+    </div>
+    <p class="err" id="sv-err"></p>
+    <div class="sheet two">
+      <svg class="chart" id="sv-svg" viewBox="0 0 520 300" role="img" aria-label="価格差異と数量差異の図"></svg>
+      <div class="stack"><div class="vlist" id="sv-list"></div><p class="caption-live" id="sv-cap"></p><p class="note">差異 ＝ 標準 − 実際。プラスなら有利差異（貸方差異）、マイナスなら不利差異（借方差異）。価格の差は実際の数量に掛け、数量の差は標準の価格に掛けます。</p></div>
+    </div>
+  </div>
+  <div class="block" id="sv-oh" hidden>
+    <div id="sv-oh-widget"></div>
+  </div>
+  <div class="block">
+    <h3>勘定記入の2つの方法</h3>
+    <div class="cards">
+      <div><h4>パーシャル・プラン</h4><p>仕掛品勘定の借方に<b>実際原価</b>を記入し、完成品・月末仕掛品は標準原価で振り替えます。差異は仕掛品勘定の中で発生します。</p></div>
+      <div><h4>シングル・プラン</h4><p>仕掛品勘定の借方にも<b>標準原価</b>を記入します。差異は材料・賃金・製造間接費の各勘定で発生します。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 工業 6 直接原価・CVP ================= -->
+<section class="chapter" id="k6" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">工業簿記 ・ 第六章</span>
+    <h2>直接原価計算とCVP分析</h2>
+    <p>原価を「売上に比例して増える変動費」と「売上に関係なくかかる固定費」に分けると、いくら売れば利益が出るかが計算できます。</p>
+  </div>
+  <div class="block">
+    <h3>CVP分析：損益分岐点</h3>
+    <div class="form-row">
+      <label>販売単価<input id="cv-p" inputmode="numeric" value="1,000"></label>
+      <label>単位あたり変動費<input id="cv-v" inputmode="numeric" value="600"></label>
+      <label>固定費<input id="cv-f" inputmode="numeric" value="2,000,000"></label>
+      <label>販売量（個）<input id="cv-q" inputmode="numeric" value="6,000"></label>
+      <label>目標営業利益<input id="cv-t" inputmode="numeric" value="400,000"></label>
+      <button class="btn" id="cv-play">再生</button>
+    </div>
+    <p class="err" id="cv-err"></p>
+    <div class="sheet two">
+      <svg class="chart" id="cv-svg" viewBox="0 0 520 320" role="img" aria-label="損益分岐点図表"></svg>
+      <div class="stack"><div class="vlist" id="cv-list"></div><div class="keys"><span><i style="background:var(--s1)"></i>売上高線</span><span><i style="background:var(--s2)"></i>総費用線</span><span><i style="background:var(--ok-tint);border:1px solid var(--ok)"></i>利益</span><span><i style="background:var(--ng-tint);border:1px solid var(--ng)"></i>損失</span></div></div>
+    </div>
+  </div>
+  <div class="block">
+    <h3>全部原価計算と直接原価計算</h3>
+    <p>1,000個つくって 800個売った月で比べます。販売単価 1,000円、変動製造原価 @400、変動販売費 @50、固定製造間接費 300,000円、固定販売費・一般管理費 100,000円。</p>
+    <div class="sheet stack">
+      <div class="cmp">
+        <div class="stack"><h4 style="font-size:15px">全部原価計算</h4><div class="fohbar" id="ab-bar"></div><div class="pl" id="ab-pl"></div></div>
+        <div class="stack"><h4 style="font-size:15px">直接原価計算</h4><div class="fohbar" id="vc-bar"></div><div class="pl" id="vc-pl"></div></div>
+      </div>
+      <p class="caption-live" id="ab-cap"></p>
+      <div class="controls"><button class="btn ghost" id="ab-play">もう一度再生</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= テスト ================= -->
+<section class="chapter" id="t" hidden>
+  <div class="ch-head">
+    <span class="eyebrow">テスト</span>
+    <h2>入力テスト</h2>
+    <p>仕訳問題は試験と同じく、勘定科目を選んで金額を入力します。行の順番は問いません。同じ科目は1行にまとめても分けても正解です。計算問題は答えの金額や数量を入力します。結果はこのブラウザに記録されます。</p>
+  </div>
+  <div id="t-menu" class="t-top">
+    <div class="sheet" style="display:grid;gap:14px">
+      <h3 style="font-size:17px">出題の設定</h3>
+      <div class="form-row">
+        <label>範囲<select id="t-scope" style="width:14em"></select></label>
+        <label>問題数<select id="t-count" style="width:7em"><option value="10">10問</option><option value="20">20問</option><option value="999">すべて</option></select></label>
+      </div>
+      <p class="err" id="t-err"></p>
+      <div class="controls"><button class="btn" id="t-start">はじめる</button><button class="btn ghost" id="t-clear">記録を消す</button></div>
+      <p class="note" id="t-clear-confirm" hidden>本当に消しますか？ <button class="btn ghost sm" id="t-clear-yes">消す</button> <button class="btn ghost sm" id="t-clear-no">やめる</button></p>
+    </div>
+    <div class="sheet" style="display:grid;gap:12px">
+      <h3 style="font-size:17px">分野ごとの正解状況</h3>
+      <div class="stats" id="t-stats"></div>
+      <p class="note">最後に解いたときに正解した問題数 ／ 問題数</p>
+    </div>
+  </div>
+  <div id="t-run" class="sheet" hidden></div>
+</section>
+
+</main>
+<footer>
+  <div class="wrap">
+    <p>学習用の自作教材です。2026年度試験の出題範囲（2025年度から変更なし）に合わせています。2027年度には手形・小切手の廃止やリース会計の見直しなどの改定が予定されています。</p>
+    <p>出題範囲・試験方式の最新情報は <a href="https://www.kentei.ne.jp/bookkeeping" target="_blank" rel="noopener">日本商工会議所の検定試験サイト</a> で確認してください。</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+/* ===================== helpers ===================== */
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const yen = n => Number(n).toLocaleString('ja-JP', {maximumFractionDigits:2});
+const sleep = ms => new Promise(r => setTimeout(r, RM ? 0 : ms));
+const raf = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function parseAmt(s){
+  if(s == null) return null;
+  s = String(s).replace(/[０-９．－]/g, ch => ch === '－' ? '-' : String.fromCharCode(ch.charCodeAt(0) - 0xFEE0))
+               .replace(/[,，、円¥￥%％\s]/g, '');
+  if(!/^-?\d+(\.\d+)?$/.test(s)) return null;
+  return Number(s);
+}
+function readNums(ids, errSel){
+  const out = {};
+  for(const id of ids){
+    const el = $('#' + id), v = parseAmt(el.value);
+    if(v == null){ $(errSel).textContent = '数字を入力してください（カンマは付けても付けなくてもかまいません）。'; el.focus(); return null; }
+    out[id] = v;
+  }
+  $(errSel).textContent = '';
+  return out;
+}
+function fmtInputs(root){
+  $$('input[inputmode="numeric"]', root).forEach(inp => inp.addEventListener('blur', () => {
+    const v = parseAmt(inp.value); if(v != null && inp.value.trim()) inp.value = yen(v);
+  }));
+}
+function signed(v){ return (v > 0 ? '＋' : v < 0 ? '−' : '') + yen(Math.abs(v)); }
+function favTag(v){ return v > 0 ? '<span class="tag okc">有利</span>' : v < 0 ? '<span class="tag ngc">不利</span>' : ''; }
+function fmtAxis(v){
+  if(v === 0) return '0';
+  if(Math.abs(v) >= 10000 && v % 1000 === 0) return yen(v / 10000) + '万';
+  return yen(v);
+}
+function niceStep(max, n=5){
+  const raw = max / n, p = 10 ** Math.floor(Math.log10(raw)), m = raw / p;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
+}
+function countTo(el, from, to, ms=600){
+  if(RM){ el.textContent = yen(to); return; }
+  const t0 = performance.now();
+  const tick = t => { const k = Math.min(1, (t - t0) / ms); el.textContent = yen(Math.round(from + (to - from) * k)); if(k < 1) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+
+function fly(from, to, html, cls){
+  if(RM || !from || !to) return Promise.resolve();
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+  if((!a.width && !a.height) || (!b.width && !b.height)) return Promise.resolve();
+  const el = document.createElement('div');
+  el.className = 'flyer ' + (cls || '');
+  el.innerHTML = html;
+  document.body.appendChild(el);
+  const w = el.offsetWidth, hh = el.offsetHeight;
+  const x0 = a.left + a.width/2 - w/2, y0 = a.top + a.height/2 - hh/2;
+  const ty = b.height > 60 ? b.bottom - 16 : b.top + b.height/2;
+  const x1 = Math.max(4, Math.min(window.innerWidth - w - 4, b.left + b.width/2 - w/2)), y1 = ty - hh/2;
+  el.style.left = x0 + 'px'; el.style.top = y0 + 'px';
+  const anim = el.animate([
+    {transform:'translate(0,0) scale(.9)', opacity:0},
+    {transform:'translate(0,-8px) scale(1)', opacity:1, offset:.18},
+    {transform:`translate(${x1-x0}px,${y1-y0}px) scale(1)`, opacity:1}
+  ], {duration:760, easing:'cubic-bezier(.45,0,.2,1)'});
+  return anim.finished.then(() => el.remove(), () => el.remove());
+}
+
+function journalTable(dr, cr){
+  const n = Math.max(dr.length, cr.length);
+  let rows = '';
+  for(let i=0;i<n;i++){
+    const d = dr[i], c = cr[i];
+    rows += `<tr><td class="dr">${d ? esc(d[0]) : ''}</td><td class="n num dr">${d ? yen(d[1]) : ''}</td><td class="cr">${c ? esc(c[0]) : ''}</td><td class="n num cr">${c ? yen(c[1]) : ''}</td></tr>`;
+  }
+  return `<table class="jt"><thead><tr><th class="dr">借方科目</th><th class="dr n">金額</th><th class="cr">貸方科目</th><th class="cr n">金額</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function tAcct(name){
+  const el = document.createElement('div');
+  el.className = 'tacct';
+  el.dataset.a = name;
+  el.innerHTML = `<div class="tname">${esc(name)}</div><div class="tbody"><ul class="tl"></ul><ul class="tr"></ul></div><div class="tbal"></div>`;
+  return el;
+}
+function tAdd(ul, label, amt){
+  const li = document.createElement('li');
+  li.innerHTML = `<span>${esc(label)}</span><span class="num">${yen(amt)}</span>`;
+  ul.appendChild(li);
+  return li;
+}
+function tBalance(t){
+  const sum = ul => $$('li .num', ul).reduce((s, x) => s + parseAmt(x.textContent), 0);
+  const L = sum($('.tl', t)), R = sum($('.tr', t)), b = $('.tbal', t);
+  if(!L && !R){ b.innerHTML = ''; return 0; }
+  b.innerHTML = L === R ? '残高 0' : `残高 <span class="num ${L>R?'dr':'cr'}">${yen(Math.abs(L-R))}</span>（${L>R?'借方':'貸方'}）`;
+  b.classList.toggle('on', true);
+  return L - R;
+}
+
+/* svg */
+const NS = 'http://www.w3.org/2000/svg';
+function S(tag, attrs={}, text){
+  const e = document.createElementNS(NS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(text != null) e.textContent = text;
+  return e;
+}
+function sLine(svg, x1, y1, x2, y2, cls, extra={}){
+  const l = S('line', Object.assign({x1, y1, x2, y2, class: cls}, extra));
+  if(/\bdraw\b/.test(cls)) l.style.setProperty('--len', Math.hypot(x2-x1, y2-y1).toFixed(1));
+  svg.appendChild(l);
+  return l;
+}
+async function turnOn(els, gap=0){
+  await raf();
+  for(const e of [].concat(els)){ e.classList.add('on'); if(gap) await sleep(gap); }
+}
+function spreadLabels(items, minGap=14){
+  items.sort((a, b) => a.y - b.y);
+  for(let i=1;i<items.length;i++) if(items[i].y - items[i-1].y < minGap) items[i].y = items[i-1].y + minGap;
+  return items;
+}
+
+/* ===================== flow widget（文章 → 仕訳） ===================== */
+function flowWidget(root, list){
+  root.innerHTML = `<div class="stack">
+    <div class="picker">${list.map((e, i) => `<button type="button" data-i="${i}" aria-pressed="${i===0}">${esc(e.n)}</button>`).join('')}</div>
+    <div class="sheet stack">
+      <p class="stage-tx"></p>
+      <div class="board">
+        <div><h4 class="dr">借方</h4><div class="fd" style="display:grid;gap:6px"></div><div class="tot fdt"></div></div>
+        <div><h4 class="cr">貸方</h4><div class="fc" style="display:grid;gap:6px"></div><div class="tot fct"></div></div>
+      </div>
+      <p class="note fnote"></p>
+      <div class="controls"><button class="btn ghost" type="button" data-replay>もう一度再生</button></div>
+    </div></div>`;
+  const st = {i:0, run:0};
+  const tx = $('.stage-tx', root);
+  $$('.picker button', root).forEach(b => b.addEventListener('click', () => {
+    st.i = +b.dataset.i;
+    $$('.picker button', root).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    play();
+  }));
+  $('[data-replay]', root).addEventListener('click', play);
+  async function play(){
+    const token = ++st.run, ok = () => token === st.run, ex = list[st.i];
+    tx.innerHTML = esc(ex.t).replace(/\{(\w+):([^}]+)\}/g, (m, k, s) => `<span class="part" data-k="${k}">${s}</span>`);
+    $('.fd', root).innerHTML = ''; $('.fc', root).innerHTML = '';
+    $('.fdt', root).innerHTML = ''; $('.fct', root).innerHTML = '';
+    $('.fnote', root).textContent = '';
+    await sleep(300); if(!ok()) return;
+    const lines = [...ex.dr.map(l => ['dr', l]), ...ex.cr.map(l => ['cr', l])];
+    for(const [side, l] of lines){
+      const span = l[2] ? $(`.part[data-k="${l[2]}"]`, tx) : null;
+      if(span){ span.classList.remove('on-dr', 'on-cr'); span.classList.add(side === 'dr' ? 'on-dr' : 'on-cr'); }
+      await sleep(260); if(!ok()) return;
+      const box = $(side === 'dr' ? '.fd' : '.fc', root);
+      await fly(span || tx, box, `${esc(l[0])} ${yen(l[1])}`, side); if(!ok()) return;
+      const chip = document.createElement('div');
+      chip.className = 'chip ' + side;
+      chip.innerHTML = `<b>${esc(l[0])}</b><span class="num">${yen(l[1])}</span>${l[3] ? `<small>${esc(l[3])}</small>` : ''}`;
+      box.appendChild(chip);
+      await sleep(120);
+    }
+    if(!ok()) return;
+    const dt = ex.dr.reduce((s, l) => s + l[1], 0), ct = ex.cr.reduce((s, l) => s + l[1], 0);
+    $('.fdt', root).innerHTML = `<span>借方合計</span><span class="num">${yen(dt)}</span>`;
+    $('.fct', root).innerHTML = `<span>貸方合計</span><span class="num">${yen(ct)}</span>`;
+    $('.fnote', root).textContent = ex.note || '';
+  }
+  return {play};
+}
+
+/* ===================== navigation ===================== */
+const PARTS = [
+  {id:'shogyo', name:'商業簿記', ch:[['c0','序','2級の全体像'],['c1','一','商品売買・収益認識'],['c2','二','有価証券'],['c3','三','固定資産・リース'],['c4','四','外貨・税効果・引当金'],['c5','五','純資産・本支店'],['c6','六','連結会計']]},
+  {id:'kogyo', name:'工業簿記', ch:[['k1','一','原価の流れ'],['k2','二','材料費・労務費'],['k3','三','製造間接費・部門別'],['k4','四','個別・総合原価計算'],['k5','五','標準原価計算'],['k6','六','直接原価計算・CVP']]},
+  {id:'test', name:'テスト', ch:[['t','','入力テスト']]}
+];
+const ALLCH = PARTS.flatMap(p => p.ch.map(c => c[0]));
+const INIT = {}, DONE = {};
+let curPart = null;
+const lastCh = {};
+$('#parts').innerHTML = PARTS.map(p => `<button type="button" data-p="${p.id}">${p.name}</button>`).join('');
+$$('#parts button').forEach(b => b.addEventListener('click', () => {
+  const p = PARTS.find(x => x.id === b.dataset.p);
+  showCh(lastCh[p.id] || p.ch[0][0], true);
+}));
+function renderNav(part, id){
+  if(curPart !== part.id){
+    curPart = part.id;
+    $('#nav-ch').innerHTML = part.ch.map(c => `<button type="button" data-ch="${c[0]}">${c[1] ? `<b>${c[1]}</b>` : ''}${c[2]}</button>`).join('');
+    $$('#nav-ch button').forEach(b => b.addEventListener('click', () => showCh(b.dataset.ch, true)));
+  }
+  $$('#parts button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.p === part.id)));
+  $$('#nav-ch button').forEach(b => b.setAttribute('aria-current', String(b.dataset.ch === id)));
+  const cur = $(`#nav-ch button[data-ch="${id}"]`);
+  if(cur && cur.scrollIntoView) cur.scrollIntoView({block:'nearest', inline:'nearest'});
+}
+function showCh(id, push){
+  if(!ALLCH.includes(id)) id = 'c0';
+  const part = PARTS.find(p => p.ch.some(c => c[0] === id));
+  lastCh[part.id] = id;
+  renderNav(part, id);
+  $$('main > .chapter').forEach(s => s.hidden = s.id !== id);
+  if(push){ try{ history.replaceState(null, '', '#' + id); }catch(e){} }
+  const nav = $('.chapters');
+  if(push && nav && window.scrollY > nav.offsetTop) window.scrollTo({top: nav.offsetTop, behavior: RM ? 'auto' : 'smooth'});
+  if(!DONE[id]){
+    DONE[id] = true;
+    const sec = $('#' + id);
+    fmtInputs(sec);
+    $$('.flow', sec).forEach(el => { const w = flowWidget(el, FLOWS[el.dataset.flow]); w.play(); });
+    if(INIT[id]) INIT[id]();
+  }
+}
+
+/* map cards in 序 */
+const MAPDESC = {
+  c1:'売上原価対立法、棚卸減耗損・商品評価損、収益認識基準', c2:'4つの分類と期末評価、償却原価法、端数利息', c3:'定額法・200%定率法・生産高比例法、買換え・除却、圧縮記帳、リース',
+  c4:'外貨建取引の換算、税効果会計、各種引当金', c5:'剰余金の配当と準備金、増資・合併、本支店会計', c6:'投資と資本の相殺消去、のれん、非支配株主持分、内部取引',
+  k1:'材料・賃金・経費 → 仕掛品 → 製品 → 売上原価の流れ', k2:'先入先出法と移動平均法、予定価格・予定賃率と差異', k3:'予算差異・操業度差異（シュラッター図）、補助部門費の配賦',
+  k4:'製造指図書ごとの集計、平均法・先入先出法のボックス図', k5:'標準原価カード、価格差異・数量差異、製造間接費の差異', k6:'損益分岐点、安全余裕率、全部原価計算との違い'
+};
+$('#map-cards').innerHTML = PARTS.slice(0, 2).flatMap(p => p.ch.filter(c => MAPDESC[c[0]]).map(c =>
+  `<button type="button" data-go="${c[0]}"><small>${p.name}・第${c[1]}章</small><h4>${c[2]}</h4><p>${MAPDESC[c[0]]}</p></button>`)).join('');
+$$('#map-cards button').forEach(b => b.addEventListener('click', () => showCh(b.dataset.go, true)));
+
+/* ===================== flow data ===================== */
+const FLOWS = {
+  taiku: [
+    {n:'仕入', t:'{d0:商品300個を@600円で仕入れ}、代金は{c0:掛け}とした。', dr:[['商品',180000,'d0','資産の増加']], cr:[['買掛金',180000,'c0','負債の増加']], note:'三分法なら「仕入」（費用）ですが、対立法では「商品」（資産）で記録します。'},
+    {n:'売上', t:'{c1:原価@600円の商品200個}を{c0:@1,000円で売り上げ}、代金は{d0:掛け}とした。', dr:[['売掛金',200000,'d0','資産の増加'],['売上原価',120000,'c1','費用の発生']], cr:[['売上',200000,'c0','収益の発生'],['商品',120000,'c1','資産の減少']], note:'売り上げるたびに、原価分を「商品」から「売上原価」へ移します。期末には売上原価勘定に当期の売上原価が集まっているので、決算整理は不要です。'},
+    {n:'売上の返品', t:'{d0:掛けで売り上げた商品10個（売価@1,000円、原価@600円）が返品された}。', dr:[['売上',10000,'d0','収益の取消し'],['商品',6000,'d0','資産の増加']], cr:[['売掛金',10000,'d0','資産の減少'],['売上原価',6000,'d0','費用の取消し']], note:'売上時の2つの仕訳を、返品された分だけ逆にします。'}
+  ],
+  rev: [
+    {n:'契約資産', t:'商品Aと商品Bを合計150,000円で販売する契約を結び、{c0:商品A（100,000円）を引き渡した}。{d0:代金はBの引渡し後に請求できる}契約である。', dr:[['契約資産',100000,'d0','資産の増加']], cr:[['売上',100000,'c0','収益の発生']], note:'Aの引渡しで売上は計上しますが、まだ請求できないので「売掛金」ではなく「契約資産」です。'},
+    {n:'契約資産→売掛金', t:'{c0:商品B（50,000円）を引き渡し}、{d0:AとBの代金150,000円を請求した}。', dr:[['売掛金',150000,'d0','資産の増加']], cr:[['売上',50000,'c0','収益の発生'],['契約資産',100000,'d0','資産の減少']], note:'請求できるようになったので、契約資産を売掛金に振り替えます。'},
+    {n:'契約負債', t:'商品の注文を受け、{d0:代金の一部30,000円が普通預金に振り込まれた}。{c0:商品はまだ引き渡していない}。', dr:[['普通預金',30000,'d0','資産の増加']], cr:[['契約負債',30000,'c0','負債の増加']], note:'先に受け取った対価は、商品を引き渡す義務として「契約負債」（問題の指示によっては前受金）にします。'},
+    {n:'返金負債', t:'{d0:商品500,000円を掛けで販売した}。{c1:取引量に応じたリベート3%の支払いが見込まれる}。', dr:[['売掛金',500000,'d0','資産の増加']], cr:[['売上',485000,'d0','収益の発生'],['返金負債',15000,'c1','負債の増加']], note:'受け取れないと見込まれる 500,000×3%＝15,000 は売上に含めず、「返金負債」にします。'},
+    {n:'役務収益・役務原価', t:'設計サービスを提供し、{d0:対価250,000円を現金で受け取った}。{d1:このサービスのためにかかった費用100,000円}は仕掛品に集計してある。', dr:[['現金',250000,'d0','資産の増加'],['役務原価',100000,'d1','費用の発生']], cr:[['役務収益',250000,'d0','収益の発生'],['仕掛品',100000,'d1','資産の減少']], note:'サービス業の売上は「役務収益」、その原価は「役務原価」。提供前にかかった費用は「仕掛品」にためておきます。'}
+  ],
+  sec: [
+    {n:'購入と端数利息', t:'売買目的で{d0:B社社債（額面1,000,000円）を@98円で購入し}、{d1:前回の利払日から73日分の端数利息14,600円}とあわせて{c0:普通預金から支払った}。', dr:[['売買目的有価証券',980000,'d0','資産の増加'],['有価証券利息',14600,'d1','収益の取消し']], cr:[['普通預金',994600,'c0','資産の減少']], note:'端数利息は 1,000,000×年利7.3%×73/365＝14,600。前の持ち主の分を立て替えて払い、次の利払日に半年分を全額受け取ります。'},
+    {n:'利払日', t:'{c0:上の社債の利払日}となり、{d0:半年分の利息36,500円が普通預金に入金された}。', dr:[['普通預金',36500,'d0','資産の増加']], cr:[['有価証券利息',36500,'c0','収益の発生']], note:'差し引き 36,500−14,600＝21,900 が、自分が持っていた期間の利息として残ります。'},
+    {n:'売却（平均原価法）', t:'売買目的で{c0:2回に分けて買ったC社株式（300株@500円、200株@550円）のうち400株}を{d0:@600円で売却し}、代金は月末に受け取ることにした。', dr:[['未収入金',240000,'d0','資産の増加']], cr:[['売買目的有価証券',208000,'c0','資産の減少'],['有価証券売却益',32000,'d0','収益の発生']], note:'平均単価は（150,000＋110,000）÷500株＝@520円。帳簿価額 400×520＝208,000 と売却額 240,000 の差が売却益です。'},
+    {n:'売買目的の評価替え', t:'決算日に、{c0:売買目的有価証券（帳簿価額500,000円）}の{d0:時価が470,000円}に下がっていた。', dr:[['有価証券評価損益',30000,'d0','評価損']], cr:[['売買目的有価証券',30000,'c0','資産の減少']], note:'差額はP/Lの「有価証券評価損益」。損でも益でも同じ科目を使います。'},
+    {n:'その他有価証券の評価替え', t:'決算日に、{d0:その他有価証券（取得原価800,000円）の時価が850,000円}になっていた（全部純資産直入法、税効果は考えない）。', dr:[['その他有価証券',50000,'d0','資産の増加']], cr:[['その他有価証券評価差額金',50000,'d0','純資産の増加']], note:'差額はP/Lを通さず、B/Sの純資産に直接入れます。翌期首に逆の仕訳で元に戻します。'},
+    {n:'償却原価法', t:'決算日に、{d0:当期首に970,000円で取得した満期保有目的債券（額面1,000,000円、満期5年）}について{c0:償却原価法（定額法）を適用した}。', dr:[['満期保有目的債券',6000,'d0','資産の増加']], cr:[['有価証券利息',6000,'c0','収益の発生']], note:'差額30,000÷5年＝6,000ずつ、帳簿価額を額面へ近づけます。'}
+  ],
+  fa: [
+    {n:'買換え', t:'{c0:旧車両（取得原価1,500,000円、減価償却累計額900,000円）}を{d1:500,000円で下取りに出し}、{d0:新車両2,000,000円を購入した}。{c1:差額は月末に支払う}。', dr:[['車両運搬具',2000000,'d0','資産の増加'],['車両運搬具減価償却累計額',900000,'c0','累計額の取消し'],['固定資産売却損',100000,'d1','費用の発生']], cr:[['車両運搬具',1500000,'c0','資産の減少'],['未払金',1500000,'c1','負債の増加']], note:'旧車両の帳簿価額は 1,500,000−900,000＝600,000。下取り価額 500,000 との差 100,000 が売却損。支払額は 2,000,000−500,000＝1,500,000。'},
+    {n:'除却', t:'期首に、{c0:備品（取得原価400,000円、減価償却累計額300,000円）を除却した}。{d0:処分価値は20,000円}と見積もられた。', dr:[['備品減価償却累計額',300000,'c0','累計額の取消し'],['貯蔵品',20000,'d0','資産の増加'],['固定資産除却損',80000,'d0','費用の発生']], cr:[['備品',400000,'c0','資産の減少']], note:'売れる見込みの額は「貯蔵品」で資産に残し、帳簿価額との差を除却損にします。'},
+    {n:'国庫補助金の受取り', t:'{d0:国から補助金600,000円を受け取り、普通預金に入金された}。', dr:[['普通預金',600000,'d0','資産の増加']], cr:[['国庫補助金受贈益',600000,'d0','収益の発生']], note:'補助金は収益。そのままだと課税されるので、次の圧縮記帳で同じ額の費用を立てます。'},
+    {n:'圧縮記帳', t:'補助金を使って機械装置1,500,000円を取得した後、{d0:補助金相当額600,000円の圧縮記帳（直接減額方式）を行った}。', dr:[['固定資産圧縮損',600000,'d0','費用の発生']], cr:[['機械装置',600000,'d0','資産の減少']], note:'機械装置の帳簿価額は 900,000 になり、減価償却もこの額をもとに計算します。'},
+    {n:'リース（利子込み法）', t:'{c0:ファイナンス・リース契約（年間リース料200,000円、期間5年）}を結び、{d0:備品のリースを開始した}。利子込み法で処理する。', dr:[['リース資産',1000000,'d0','資産の増加']], cr:[['リース債務',1000000,'c0','負債の増加']], note:'利子込み法ではリース料総額 200,000×5＝1,000,000 で計上します。'},
+    {n:'リース料の支払（利子抜き法）', t:'利子抜き法（見積現金購入価額900,000円）で処理しているリースについて、{c0:1回目のリース料200,000円を普通預金から支払った}。{d1:利息は定額法で配分する}。', dr:[['リース債務',180000,'c0','負債の減少'],['支払利息',20000,'d1','費用の発生']], cr:[['普通預金',200000,'c0','資産の減少']], note:'利息の総額 1,000,000−900,000＝100,000 を5年で割って 20,000。残りの 180,000 がリース債務の返済分です。'},
+    {n:'ソフトウェアの償却', t:'決算日に、{c0:当期首に600,000円で取得した自社利用のソフトウェア}を{d0:5年で定額法により償却した}。', dr:[['ソフトウェア償却',120000,'d0','費用の発生']], cr:[['ソフトウェア',120000,'c0','資産の減少']], note:'無形固定資産は残存価額ゼロで、累計額を使わず直接減らします。'},
+    {n:'建設仮勘定', t:'{d0:建設中の建物が完成し引渡しを受けた}。{c0:工事代金8,000,000円のうち5,000,000円は支払済み}で、{c1:残額は普通預金から支払った}。', dr:[['建物',8000000,'d0','資産の増加']], cr:[['建設仮勘定',5000000,'c0','資産の減少'],['普通預金',3000000,'c1','資産の減少']], note:'完成前に払った分は「建設仮勘定」にためておき、完成時に建物へ振り替えます。'}
+  ],
+  eq: [
+    {n:'増資', t:'{c0:新株500株を1株60,000円で発行し}、{d0:全額が普通預金に払い込まれた}。資本金には会社法の最低限度額を計上する。', dr:[['普通預金',30000000,'d0','資産の増加']], cr:[['資本金',15000000,'c0','純資産の増加'],['資本準備金',15000000,'c0','純資産の増加']], note:'払込額のうち1/2までは資本金にしなくてよく、残りは資本準備金にします。'},
+    {n:'剰余金の配当', t:'株主総会で、{d0:繰越利益剰余金を財源とする配当1,500,000円}と{c1:必要額の利益準備金の積立て}が決議された。{c0:配当はまだ支払っていない}。', dr:[['繰越利益剰余金',1600000,'d0','純資産の減少']], cr:[['未払配当金',1500000,'c0','負債の増加'],['利益準備金',100000,'c1','純資産の増加']], note:'上の図と同じ数字です。1/10 の 150,000 ではなく、上限までの残り 100,000 が積立額です。'},
+    {n:'吸収合併', t:'A社を吸収合併し、{d0:A社の諸資産5,000,000円}と{c0:諸負債3,000,000円}を引き継いだ。対価として{c1:新株を発行し（時価2,500,000円）、全額を資本金とした}。', dr:[['諸資産',5000000,'d0','資産の増加'],['のれん',500000,'c1','資産の増加']], cr:[['諸負債',3000000,'c0','負債の増加'],['資本金',2500000,'c1','純資産の増加']], note:'受け入れた純資産 2,000,000 より多い 2,500,000 を払ったので、差額 500,000 は「のれん」です。'},
+    {n:'本店：商品を支店へ送付', t:'【本店の仕訳】{c0:支店へ商品100,000円（原価）を送付した}。', dr:[['支店',100000,'c0','']], cr:[['仕入',100000,'c0','']], note:'支店側は（借）仕入 100,000／（貸）本店 100,000。'},
+    {n:'支店：本店の買掛金を支払', t:'【支店の仕訳】{d0:本店の買掛金70,000円}を{c0:現金で支払った}。', dr:[['本店',70000,'d0','']], cr:[['現金',70000,'c0','資産の減少']], note:'本店側は（借）買掛金 70,000／（貸）支店 70,000。'}
+  ],
+  cons: [
+    {n:'開始仕訳', t:'{d0:前年度末（支配獲得日）に行った投資と資本の相殺消去}を、当年度の最初にもう一度行う。', dr:[['資本金当期首残高',300000,'d0',''],['利益剰余金当期首残高',150000,'d0',''],['のれん',40000,'d0','']], cr:[['子会社株式',400000,'d0',''],['非支配株主持分当期首残高',90000,'d0','']], note:'連結財務諸表は毎年、個別財務諸表の合算からやり直すので、前年度までの修正を最初に入れ直します。'},
+    {n:'のれんの償却', t:'{d0:のれん40,000円を10年で均等償却する}。', dr:[['のれん償却',4000,'d0','費用の発生']], cr:[['のれん',4000,'d0','資産の減少']], note:'のれんは20年以内の効果が及ぶ期間で償却します。'},
+    {n:'子会社の利益の配分', t:'{d0:S社の当期純利益50,000円}のうち、{c0:非支配株主の持分20%}を振り替える。', dr:[['非支配株主に帰属する当期純利益',10000,'d0','']], cr:[['非支配株主持分',10000,'c0','']], note:'S社の利益は全額合算されているので、非支配株主の取り分だけを分けておきます。'},
+    {n:'子会社の配当', t:'{c0:S社が配当20,000円を支払った}。{d0:P社はそのうち16,000円を受取配当金としている}。', dr:[['受取配当金',16000,'d0','収益の取消し'],['非支配株主持分',4000,'c0','']], cr:[['剰余金の配当',20000,'c0','']], note:'グループ内のお金の移動なので消します。非支配株主に払った分は、その持分を減らします。'},
+    {n:'内部取引の消去', t:'{d0:P社はS社に商品500,000円を売り上げている}（S社では仕入）。', dr:[['売上高',500000,'d0','']], cr:[['売上原価',500000,'d0','']], note:'グループ内の売買はなかったことにします。連結P/Lでは「売上高」「売上原価」の科目を使います。'},
+    {n:'債権債務の消去', t:'{d0:P社の売掛金のうち100,000円はS社に対するもの}である。', dr:[['買掛金',100000,'d0','']], cr:[['売掛金',100000,'d0','']], note:'その売掛金に貸倒引当金を設定していれば、その分も修正します。'},
+    {n:'未実現利益の消去', t:'{c0:S社の期末商品のうち80,000円はP社から仕入れたもの}で、{d0:P社は原価に25%の利益を加算して販売している}。', dr:[['売上原価',16000,'d0','']], cr:[['商品',16000,'c0','']], note:'まだグループの外に売れていない商品に含まれる利益 80,000×0.25÷1.25＝16,000 を消します（親会社→子会社のダウンストリームなので全額親会社が負担）。'}
+  ],
+  mat: [
+    {n:'材料の購入', t:'{d0:素材1,000kgを@300円で掛けで購入し}、{c1:引取運賃10,000円は現金で支払った}。', dr:[['材料',310000,'d0','']], cr:[['買掛金',300000,'d0',''],['現金',10000,'c1','']], note:'引取運賃などの材料副費は、材料の購入原価に含めます。'},
+    {n:'材料の消費', t:'{c0:素材500kgを予定価格@200円で消費した}。{d0:うち400kgは直接材料}、{d1:100kgは間接材料}である。', dr:[['仕掛品',80000,'d0','直接材料費'],['製造間接費',20000,'d1','間接材料費']], cr:[['材料',100000,'c0','']], note:'直接材料費は仕掛品へ、間接材料費は製造間接費へ。'},
+    {n:'材料消費価格差異', t:'月末に計算した{c0:実際消費額は104,000円}で、{d0:予定消費額100,000円との差}を振り替えた。', dr:[['材料消費価格差異',4000,'d0','不利差異']], cr:[['材料',4000,'c0','']], note:'実際のほうが高い → 借方差異（不利差異）。'},
+    {n:'労務費の消費', t:'直接工が{d0:直接作業400時間}、{d1:間接作業50時間}働いた（{c0:予定賃率@1,200円}）。', dr:[['仕掛品',480000,'d0','直接労務費'],['製造間接費',60000,'d1','間接労務費']], cr:[['賃金',540000,'c0','']], note:'直接工でも、間接作業の時間分は間接労務費です。'},
+    {n:'賃率差異', t:'{c0:当月の実際消費額は555,000円}で、{d0:予定消費額540,000円との差}を振り替えた。', dr:[['賃率差異',15000,'d0','不利差異']], cr:[['賃金',15000,'c0','']], note:'実際のほうが高い → 借方差異（不利差異）。'},
+    {n:'未払賃金', t:'{d0:月末に、当月分の賃金のうち未払いの90,000円}を{c0:未払賃金として計上した}。', dr:[['賃金',90000,'d0','']], cr:[['未払賃金',90000,'c0','負債の増加']], note:'賃金勘定の借方に加えることで、支払っていない分も当月の消費額に含まれます。'}
+  ]
+};
+
+/* ===================== c1 棚卸減耗・評価損 ===================== */
+const SINV = {run:0};
+INIT.c1 = () => { playInv(); };
+$('#inv-play').addEventListener('click', playInv);
+async function playInv(){
+  const v = readNums(['inv-cost','inv-nrv','inv-bq','inv-aq'], '#inv-err'); if(!v) return;
+  const cost = v['inv-cost'], nrv = v['inv-nrv'], bq = v['inv-bq'], aq = v['inv-aq'];
+  if(cost <= 0 || nrv < 0 || bq <= 0 || aq < 0){ $('#inv-err').textContent = '0より大きい数字を入力してください。'; return; }
+  if(aq > bq){ $('#inv-err').textContent = '実地数量は帳簿数量以下にしてください（減耗がある場合の図です）。'; return; }
+  const token = ++SINV.run, ok = () => token === SINV.run;
+  const nE = Math.min(nrv, cost);
+  const book = cost * bq, loss = (bq - aq) * cost, val = (cost - nE) * aq, bs = nE * aq;
+  const pX = q => q / bq * 100, pY = p => p / cost * 100;
+  const R = (cls, l, b, w, h, txt) => `<div class="rg ${cls}" style="left:${l}%;bottom:${b}%;width:${w}%;height:${h}%"><span>${txt}</span></div>`;
+  const big = (w, h) => w > 16 && h > 14;
+  $('#inv').innerHTML =
+    R('r-bs', 0, 0, pX(aq), pY(nE), big(pX(aq), pY(nE)) ? `B/S 商品<br><b class="num">${yen(bs)}</b>` : '') +
+    (val > 0 ? R('r-val', 0, pY(nE), pX(aq), 100 - pY(nE), big(pX(aq), 100 - pY(nE)) ? `商品評価損<br><b class="num">${yen(val)}</b>` : '') : '') +
+    (loss > 0 ? R('r-loss', pX(aq), 0, 100 - pX(aq), 100, big(100 - pX(aq), 100) ? `減耗損<br><b class="num">${yen(loss)}</b>` : '') : '');
+  const yl = [{y:100, t:`原価 @${yen(cost)}`}];
+  if(nE < cost) yl.push({y:Math.min(pY(nE), 92), t:`正味 @${yen(nE)}`});
+  $('#inv-y').innerHTML = yl.map(o => `<span style="bottom:${o.y}%">${o.t}</span>`).join('');
+  const xl = [{x:100, t:`帳簿 ${yen(bq)}`}];
+  if(aq < bq) xl.push({x:pX(aq), t:`実地 ${yen(aq)}`});
+  $('#inv-x').innerHTML = xl.map((o, i) => `<span style="left:${o.x}%;${i && 100 - o.x < 18 ? 'top:14px' : ''}">${o.t}</span>`).join('');
+  if(aq < bq && 100 - pX(aq) < 18) $('#inv-x').style.height = '32px'; else $('#inv-x').style.height = '18px';
+  $('#inv-list').innerHTML = `<div><span>帳簿棚卸高（${yen(cost)}×${yen(bq)}）</span><b class="num">${yen(book)}</b></div>
+    <div><span>棚卸減耗損（${yen(cost)}×（${yen(bq)}−${yen(aq)}））</span><b class="num">${yen(loss)}</b></div>
+    <div><span>商品評価損（（${yen(cost)}−${yen(nE)}）×${yen(aq)}）</span><b class="num">${yen(val)}</b></div>
+    <div class="tot"><span>B/S 商品（${yen(nE)}×${yen(aq)}）</span><b class="num">${yen(bs)}</b></div>`;
+  $('#inv-jt').innerHTML = '';
+  $('#inv-cap').textContent = `帳簿棚卸高：原価 @${yen(cost)} × 帳簿数量 ${yen(bq)} ＝ ${yen(book)}`;
+  await sleep(900); if(!ok()) return;
+  const rl = $('#inv .r-loss'), rv = $('#inv .r-val'), rb = $('#inv .r-bs');
+  if(rl){ rl.classList.add('c-loss', 'show'); $('#inv-cap').textContent = `① 足りない ${yen(bq - aq)}個 × 原価 ＝ 棚卸減耗損 ${yen(loss)}`; await sleep(1300); if(!ok()) return; }
+  if(rv){ rv.classList.add('c-val', 'show'); $('#inv-cap').textContent = `② 残った ${yen(aq)}個 × 値下がり分 @${yen(cost - nE)} ＝ 商品評価損 ${yen(val)}`; await sleep(1300); if(!ok()) return; }
+  rb.classList.add('c-bs', 'show');
+  $('#inv-cap').textContent = nrv >= cost && !loss ? '減耗も値下がりもないので、帳簿棚卸高がそのままB/Sの商品になります。'
+    : `③ 残りの ${yen(bs)} がB/Sの商品（期末商品）になります。` + (nrv >= cost ? '（正味売却価額が原価以上なので評価損はなし）' : '');
+  const dr = [], cr = [];
+  if(loss) dr.push(['棚卸減耗損', loss]);
+  if(val) dr.push(['商品評価損', val]);
+  if(loss + val) cr.push(['繰越商品', loss + val]);
+  $('#inv-jt').innerHTML = dr.length ? journalTable(dr, cr) : '';
+}
+
+/* ===================== c2 償却原価法 ===================== */
+const SAM = {run:0};
+INIT.c2 = () => { playAm(); };
+$('#am-play').addEventListener('click', playAm);
+async function playAm(){
+  const v = readNums(['am-face','am-cost','am-years'], '#am-err'); if(!v) return;
+  const face = v['am-face'], cost = v['am-cost'], n = v['am-years'];
+  if(!Number.isInteger(n) || n < 1 || n > 10){ $('#am-err').textContent = '年数は1〜10の整数にしてください。'; return; }
+  if(cost >= face || cost <= 0){ $('#am-err').textContent = 'この図は、額面より安く取得した場合を表示します。取得価額を額面より小さくしてください。'; return; }
+  const token = ++SAM.run, ok = () => token === SAM.run;
+  const diff = face - cost, per = Math.floor(diff / n), rows = [];
+  let bv = cost;
+  for(let y=1;y<=n;y++){ const a = y === n ? face - bv : per; bv += a; rows.push([y, a, bv]); }
+  $('#am-head').innerHTML = `額面 ${yen(face)} − 取得価額 ${yen(cost)} ＝ 差額 <b class="num">${yen(diff)}</b>（金利の調整分）を ${n}年に配分します。下の帯はこの差額を拡大したものです。`;
+  $('#am-bar').innerHTML = rows.map(r => `<div>${r[0]}年目</div>`).join('');
+  $('#am-table').innerHTML = `<thead><tr><th>年</th><th>償却額</th><th>期末の帳簿価額</th></tr></thead><tbody><tr><td>取得時</td><td></td><td class="num">${yen(cost)}</td></tr>${rows.map(r => `<tr data-y="${r[0]}" style="opacity:.25"><td>${r[0]}年目</td><td class="num">${yen(r[1])}</td><td class="num">${yen(r[2])}</td></tr>`).join('')}</tbody>`;
+  $('#am-jt').innerHTML = journalTable([['満期保有目的債券', rows[0][1]]], [['有価証券利息', rows[0][1]]]) + '<p class="note" style="margin-top:6px">毎期末の仕訳（1年目）</p>';
+  const cells = $$('#am-bar > div');
+  for(let i=0;i<rows.length;i++){
+    await sleep(i ? 520 : 300); if(!ok()) return;
+    cells[i].classList.add('on'); cells[i].textContent = '+' + yen(rows[i][1]);
+    const tr = $(`#am-table tr[data-y="${rows[i][0]}"]`); tr.style.opacity = 1; tr.classList.add('hot');
+    if(i) $(`#am-table tr[data-y="${rows[i-1][0]}"]`).classList.remove('hot');
+    $('#am-cap').textContent = `${rows[i][0]}年目：帳簿価額 ${yen(rows[i][2] - rows[i][1])} → ${yen(rows[i][2])}`;
+  }
+  await sleep(500); if(!ok()) return;
+  $$('#am-table tr.hot').forEach(r => r.classList.remove('hot'));
+  $('#am-cap').textContent = `満期日には帳簿価額がちょうど額面 ${yen(face)} になり、額面で償還されます。`;
+}
+
+/* ===================== c3 減価償却3方式 ===================== */
+const DEP3 = {
+  sl:[200000,200000,200000,200000,200000],
+  db:[400000,240000,144000,108000,107999],
+  ua:[300000,250000,200000,150000,100000], km:[30000,25000,20000,15000,10000]
+};
+INIT.c3 = () => { drawDep3(); };
+$('#dep3-play').addEventListener('click', drawDep3);
+async function drawDep3(){
+  const svg = $('#dep3'); svg.innerHTML = '';
+  const m = {l:56, r:12, t:14, b:34}, W = 640, H = 270, pw = W - m.l - m.r, ph = H - m.t - m.b, ymax = 400000;
+  const Y = v => m.t + ph - v / ymax * ph;
+  for(let v=0; v<=ymax; v+=100000){
+    sLine(svg, m.l, Y(v), W - m.r, Y(v), v ? 'gl' : 'base');
+    svg.appendChild(S('text', {x:m.l - 6, y:Y(v) + 4, 'text-anchor':'end', class:'axn'}, fmtAxis(v)));
+  }
+  const gw = pw / 5, bw = 26, gap = 4, inner = bw*3 + gap*2, bars = [];
+  const series = [['sl','s1','定額法'],['db','s2','200%定率法'],['ua','s3','生産高比例法']];
+  for(let y=0;y<5;y++){
+    const gx = m.l + gw*y + (gw - inner)/2;
+    series.forEach(([k, c, name], i) => {
+      const val = DEP3[k][y], x = gx + i*(bw + gap);
+      const r = S('rect', {x, y:Y(val), width:bw, height:Y(0) - Y(val), rx:2, class:`grow c-${c}`});
+      r.appendChild(S('title', {}, `${y+1}年目 ${name}：${yen(val)}円`));
+      svg.appendChild(r); bars.push(r);
+    });
+    svg.appendChild(S('text', {x:m.l + gw*y + gw/2, y:H - 12, 'text-anchor':'middle', class:'ax'}, `${y+1}年目`));
+  }
+  $('#dep3-table').innerHTML = `<thead><tr><th>年</th><th>定額法</th><th>200%定率法</th><th>生産高比例法</th></tr></thead><tbody>` +
+    [0,1,2,3,4].map(y => `<tr><td>${y+1}年目</td><td class="num">${yen(DEP3.sl[y])}</td><td class="num">${yen(DEP3.db[y])}</td><td class="num">${yen(DEP3.ua[y])}<span class="note">（${yen(DEP3.km[y])}km）</span></td></tr>`).join('') +
+    `<tr class="total"><td>合計</td><td class="num">1,000,000</td><td class="num">999,999</td><td class="num">1,000,000</td></tr></tbody>`;
+  await raf();
+  for(let i=0;i<bars.length;i+=3){ bars.slice(i, i+3).forEach(b => b.classList.add('on')); await sleep(260); }
+}
+
+/* ===================== c4 外貨建取引 ===================== */
+const FX = [
+  {d:'取引日 3/1', rate:110, title:'商品 $1,000 を掛けで輸入', dr:[['仕入',110000]], cr:[['買掛金',110000]], ap:110000, cap:'取引日のレート @110円で換算。買掛金は 110,000円。'},
+  {d:'決算日 3/31', rate:115, title:'買掛金 $1,000 を換算替え', dr:[['為替差損益',5000]], cr:[['買掛金',5000]], ap:115000, cap:'決算日のレート @115円で換算し直す。払う円が 5,000円増えたので為替差損（借方）。'},
+  {d:'決済日 4/30', rate:112, title:'買掛金 $1,000 を普通預金で支払い', dr:[['買掛金',115000]], cr:[['普通預金',112000],['為替差損益',3000]], ap:0, cap:'決済日のレート @112円で支払う。帳簿の 115,000 より 3,000 少なく済んだので為替差益（貸方）。'}
+];
+const SFX = {i:-1};
+INIT.c4 = () => { renderFx(); stepFx(); playTax(); };
+function renderFx(){
+  $('#fx-cards').innerHTML = FX.map((f, i) => `<div class="stepcard" data-i="${i}"><span class="d">${f.d}</span><span class="rate">@${f.rate}<span style="font-size:13px">円/$</span></span><b style="font-size:14px">${f.title}</b>${journalTable(f.dr, f.cr)}<span class="note">買掛金の残高：<b class="num" data-ap>${yen(i ? FX[i-1].ap : 0)}</b>円</span></div>`).join('');
+}
+function paintFx(){
+  $$('#fx-cards .stepcard').forEach((c, i) => { c.classList.toggle('on', i <= SFX.i); c.classList.toggle('cur', i === SFX.i); });
+  $('#fx-cap').textContent = SFX.i >= 0 ? FX[SFX.i].cap : '';
+  $('#fx-step').textContent = `${SFX.i + 1} / ${FX.length}`;
+  $('#fx-prev').disabled = SFX.i <= 0; $('#fx-next').disabled = SFX.i >= FX.length - 1;
+}
+function stepFx(){
+  if(SFX.i >= FX.length - 1) return;
+  SFX.i++; paintFx();
+  const c = $(`#fx-cards .stepcard[data-i="${SFX.i}"] [data-ap]`);
+  countTo(c, SFX.i ? FX[SFX.i-1].ap : 0, FX[SFX.i].ap);
+}
+$('#fx-next').addEventListener('click', stepFx);
+$('#fx-prev').addEventListener('click', () => { if(SFX.i > 0){ SFX.i--; renderFx(); for(let k=0;k<=SFX.i;k++) $(`#fx-cards .stepcard[data-i="${k}"] [data-ap]`).textContent = yen(FX[k].ap); paintFx(); } });
+
+/* ===================== c4 税効果 ===================== */
+const STX = {run:0};
+$('#tx-play').addEventListener('click', playTax);
+async function playTax(){
+  const v = readNums(['tx-pi','tx-add','tx-rate'], '#tx-err'); if(!v) return;
+  const pi = v['tx-pi'], add = v['tx-add'], r = v['tx-rate'];
+  if(pi <= 0 || add < 0 || r <= 0 || r >= 100){ $('#tx-err').textContent = '利益は0より大きく、税率は0〜100%の間で入力してください。'; return; }
+  const token = ++STX.run, ok = () => token === STX.run;
+  const ti = pi + add, tax = Math.round(ti * r / 100), adj = Math.round(add * r / 100), ni0 = pi - tax, ni = pi - tax + adj;
+  const svg = $('#tx-bars'); svg.innerHTML = '';
+  const x0 = 116, wmax = 290, sc = wmax / ti;
+  svg.appendChild(S('text', {x:0, y:38, class:'lbl'}, '会計上の利益'));
+  svg.appendChild(S('text', {x:0, y:90, class:'lbl'}, '課税所得'));
+  const b1 = S('rect', {x:x0, y:20, width:pi*sc, height:28, class:'growx', style:'fill:var(--e-asset)'});
+  const b2 = S('rect', {x:x0, y:72, width:pi*sc, height:28, class:'growx', style:'fill:var(--e-asset)'});
+  const b3 = S('rect', {x:x0 + pi*sc, y:72, width:Math.max(add*sc, 0), height:28, class:'fade', style:'fill:var(--ng-tint);stroke:var(--ng);stroke-width:1.5'});
+  svg.append(b1, b2, b3);
+  svg.appendChild(S('text', {x:x0 + 6, y:39, class:'lbln'}, yen(pi)));
+  svg.appendChild(S('text', {x:x0 + 6, y:91, class:'lbln'}, yen(ti)));
+  const t3 = S('text', {x:Math.min(x0 + pi*sc - 4, 410), y:116, 'text-anchor':'end', class:'axn fade'}, `＋${yen(add)}（損金不算入）`);
+  svg.appendChild(t3);
+  $('#tx-pl').innerHTML = `
+    <div><span>税引前当期純利益</span><b class="num">${yen(pi)}</b></div>
+    <div data-r="tax"><span>法人税、住民税及び事業税<br><small>課税所得 ${yen(ti)} × ${r}%</small></span><b class="num">${yen(tax)}</b></div>
+    <div data-r="adj" class="off"><span>法人税等調整額<br><small>${yen(add)} × ${r}%</small></span><b class="num">△${yen(adj)}</b></div>
+    <div class="sum" data-r="ni"><span>当期純利益</span><b class="num" id="tx-ni">${yen(ni0)}</b></div>`;
+  $('#tx-jt').innerHTML = '';
+  $('#tx-cap').textContent = '税金は、会計上の利益ではなく課税所得に税率を掛けて計算します。';
+  await turnOn([b1, b2]); await sleep(700); if(!ok()) return;
+  b3.classList.add('on'); t3.classList.add('on');
+  $('#tx-cap').textContent = add ? `損金不算入の ${yen(add)} だけ課税所得が大きくなり、税金は ${yen(tax)} になる。` : '一時差異がないので、調整は不要です。';
+  if(!add) return;
+  await sleep(1400); if(!ok()) return;
+  const ra = $('#tx-pl [data-r="adj"]'); ra.classList.remove('off'); ra.classList.add('new');
+  countTo($('#tx-ni'), ni0, ni);
+  $('#tx-cap').textContent = `将来戻ってくる税金 ${yen(adj)} を繰延税金資産にし、税金費用から差し引く。利益 ${yen(pi)} の ${100 - r}% にあたる ${yen(ni)} が残る。`;
+  $('#tx-jt').innerHTML = journalTable([['繰延税金資産', adj]], [['法人税等調整額', adj]]);
+}
+
+/* ===================== c5 準備金 ===================== */
+const SDV = {run:0};
+INIT.c5 = () => { playDv(); renderHb(0); };
+$('#dv-play').addEventListener('click', playDv);
+async function playDv(){
+  const v = readNums(['dv-cap','dv-cr','dv-rr','dv-div'], '#dv-err'); if(!v) return;
+  const cap = v['dv-cap'], crr = v['dv-cr'], rr = v['dv-rr'], div = v['dv-div'];
+  if(cap <= 0 || crr < 0 || rr < 0 || div <= 0){ $('#dv-err').textContent = '資本金と配当額は0より大きい数字を入力してください。'; return; }
+  const token = ++SDV.run, ok = () => token === SDV.run;
+  const lim = cap / 4, ex = crr + rr, room = Math.max(0, lim - ex), tenth = div / 10, amt = Math.round(Math.min(room, tenth));
+  const full = Math.max(lim, ex + tenth) * 1.12, pct = x => x / full * 100 + '%';
+  const A = $('#dv-a'), B = $('#dv-b'), X = $('#dv-x'), L = $('#dv-lim');
+  A.style.width = '0%'; B.style.left = pct(ex); B.style.width = '0%';
+  X.classList.remove('on'); X.style.left = pct(Math.min(ex, lim) + amt); X.style.width = pct(Math.max(0, tenth - amt));
+  L.style.left = pct(lim); $('#dv-limlabel').textContent = `上限 ${yen(lim)}`;
+  $('#dv-jt').innerHTML = '';
+  $('#dv-cap').textContent = `上限は資本金 ${yen(cap)} の1/4 ＝ ${yen(lim)}。いまの準備金は ${yen(crr)}＋${yen(rr)} ＝ ${yen(ex)}。`;
+  await raf(); A.style.width = pct(ex);
+  await sleep(1100); if(!ok()) return;
+  B.style.width = pct(amt);
+  $('#dv-cap').textContent = `配当額の1/10 は ${yen(tenth)}。`;
+  await sleep(1000); if(!ok()) return;
+  if(tenth > amt){
+    X.classList.add('on');
+    $('#dv-cap').textContent = ex >= lim ? 'すでに上限に達しているので、積み立ては不要です。'
+      : `1/10 の ${yen(tenth)} を積むと上限を超えるので、上限までの残り ${yen(amt)} だけ積み立てる。`;
+  }else{
+    $('#dv-cap').textContent = `上限までまだ ${yen(room)} 余裕があるので、1/10 の ${yen(amt)} をそのまま積み立てる。`;
+  }
+  const cr = [['未払配当金', div]]; if(amt) cr.push(['利益準備金', amt]);
+  $('#dv-jt').innerHTML = journalTable([['繰越利益剰余金', div + amt]], cr);
+}
+
+/* ===================== c5 本支店 ===================== */
+const HB = [
+  {t:'取引を1件ずつ進めて、本店の「支店」勘定と支店の「本店」勘定がどう動くかを見てください。'},
+  {t:'本店は、支店へ現金100,000円を送付した。', h:[['支店',100000],['現金',100000]], b:[['現金',100000],['本店',100000]], hp:'現金', bp:'現金', n:100000},
+  {t:'本店は、支店の買掛金50,000円を現金で支払った。', h:[['支店',50000],['現金',50000]], b:[['買掛金',50000],['本店',50000]], hp:'現金', bp:'買掛金', n:50000},
+  {t:'支店は、本店の売掛金30,000円を現金で回収した。', h:[['支店',30000],['売掛金',30000]], b:[['現金',30000],['本店',30000]], hp:'売掛金', bp:'現金', n:30000},
+  {t:'決算：本店と支店を合わせた財務諸表（合併財務諸表）を作る。', end:true}
+];
+const SHB = {i:0, busy:false};
+function hbJ(pair){ return pair ? journalTable([pair[0]], [pair[1]]) : ''; }
+function renderHb(i){
+  SHB.i = i;
+  const th = tAcct('支店'), tb = tAcct('本店');
+  $('#hb-th').replaceChildren(th); $('#hb-tb').replaceChildren(tb);
+  for(let k=1;k<=Math.min(i, 3);k++){ tAdd($('.tl', th), HB[k].hp, HB[k].n); tAdd($('.tr', tb), HB[k].bp, HB[k].n); }
+  tBalance(th); tBalance(tb);
+  const s = HB[i];
+  $('#hb-text').textContent = s.t;
+  $('#hb-jh').innerHTML = s.h ? hbJ(s.h) : '';
+  $('#hb-jb').innerHTML = s.b ? hbJ(s.b) : '';
+  $('#hb-cap').textContent = s.end ? '「支店」180,000（借方）と「本店」180,000（貸方）は同じ額。合併するときに相殺して消します。' : '';
+  if(s.end){
+    [th, tb].forEach(t => { t.style.position = 'relative'; const st = document.createElement('div'); st.className = 'stamp'; st.textContent = '相殺'; t.appendChild(st); });
+    requestAnimationFrame(() => requestAnimationFrame(() => { $$('#c5 .stamp').forEach(x => x.classList.add('on')); [th, tb].forEach(t => t.classList.add('glow')); }));
+  }
+  $('#hb-step').textContent = `${i} / ${HB.length - 1}`;
+  $('#hb-prev').disabled = i === 0; $('#hb-next').disabled = i === HB.length - 1;
+}
+$('#hb-next').addEventListener('click', async () => {
+  if(SHB.busy || SHB.i >= HB.length - 1) return;
+  SHB.busy = true;
+  const k = SHB.i + 1, s = HB[k];
+  if(!s.end){
+    $('#hb-text').textContent = s.t;
+    $('#hb-jh').innerHTML = hbJ(s.h); $('#hb-jb').innerHTML = hbJ(s.b);
+    $('#hb-cap').textContent = '本店は「支店」勘定の借方へ、支店は「本店」勘定の貸方へ記入する。';
+    await fly($('#hb-jh tbody tr td.dr'), $('#hb-th .tl'), `支店 ${yen(s.n)}`, 'dr');
+    await fly($('#hb-jb tbody tr td.cr'), $('#hb-tb .tr'), `本店 ${yen(s.n)}`, 'cr');
+  }
+  renderHb(k);
+  if(!s.end) $('#hb-cap').textContent = '本店は「支店」勘定の借方へ、支店は「本店」勘定の貸方へ記入する。';
+  SHB.busy = false;
+});
+$('#hb-prev').addEventListener('click', () => { if(!SHB.busy && SHB.i > 0) renderHb(SHB.i - 1); });
+$('#hb-reset').addEventListener('click', () => { if(!SHB.busy) renderHb(0); });
+
+/* ===================== c6 連結 ===================== */
+const SCS = {run:0};
+INIT.c6 = () => { playCs(); };
+$('#cs-play').addEventListener('click', playCs);
+async function playCs(){
+  const v = readNums(['cs-cost','cs-ratio','cs-cap','cs-re'], '#cs-err'); if(!v) return;
+  const cost = v['cs-cost'], ratio = v['cs-ratio'], cap = v['cs-cap'], re = v['cs-re'];
+  if(ratio <= 50 || ratio > 100){ $('#cs-err').textContent = '支配している（子会社になる）場合の図なので、持分比率は50%超〜100%で入力してください。'; return; }
+  if(cost <= 0 || cap <= 0 || re < 0){ $('#cs-err').textContent = '取得原価と資本金は0より大きい数字を入力してください。'; return; }
+  const token = ++SCS.run, ok = () => token === SCS.run;
+  const eqT = cap + re, ps = Math.round(eqT * ratio / 100), nci = eqT - ps, gw = cost - ps;
+  const H = 220, sc = H / Math.max(cost, eqT, ps + Math.max(gw, 0));
+  const blk = (cls, val, txt) => `<div class="cb ${cls}" style="height:${Math.max(val*sc, 0)}px">${txt}</div>`;
+  const lab = (name, val) => val * sc >= 30 ? `${name}<br><b class="num">${yen(val)}</b>` : val * sc >= 16 ? `${name} <b class="num">${yen(val)}</b>` : '';
+  $$('#c6 .cons-col').forEach(c => c.classList.remove('off'));
+  $('#cs-P').innerHTML = blk('inv', cost, lab('子会社株式', cost));
+  $('#cs-S').innerHTML = blk('re', re, lab('利益剰余金', re)) + blk('cap', cap, lab('資本金', cap));
+  $('#cs-N').innerHTML = '';
+  $('#cs-jt').innerHTML = '';
+  $('#cs-cap').textContent = `P社はS社株式を ${yen(cost)} で取得。S社の純資産は ${yen(cap)}＋${yen(re)} ＝ ${yen(eqT)}。`;
+  await sleep(1300); if(!ok()) return;
+  $('#cs-S').innerHTML = blk('nci', nci, lab(`非支配 ${100 - ratio}%`, nci)) + blk('pshare', ps, lab(`P社持分 ${ratio}%`, ps));
+  $('#cs-cap').textContent = `S社の純資産を持分比率で分ける：P社の持分 ${yen(ps)}、非支配株主の持分 ${yen(nci)}。`;
+  await sleep(1300); if(!ok()) return;
+  if(nci > 0){
+    const from = $('#cs-S .cb.nci');
+    await fly(from, $('#cs-N'), `非支配株主持分 ${yen(nci)}`, 'cr'); if(!ok()) return;
+    from.style.height = '0px'; from.style.opacity = '0';
+    $('#cs-N').innerHTML = blk('nci', nci, lab('非支配株主持分', nci));
+    $('#cs-cap').textContent = `P社のものでない ${yen(nci)} は「非支配株主持分」として連結B/Sの純資産に表示する。`;
+    await sleep(1300); if(!ok()) return;
+  }
+  if(gw > 0){
+    $('#cs-S').insertAdjacentHTML('afterbegin', blk('gw', gw, lab('のれん', gw)));
+    $('#cs-cap').textContent = `投資額 ${yen(cost)} は持分 ${yen(ps)} より ${yen(gw)} 多い。この差額が「のれん」（目に見えない価値への支払い）。`;
+  }else if(gw < 0){
+    $('#cs-P').insertAdjacentHTML('afterbegin', blk('ngw', -gw, lab('負ののれん', -gw)));
+    $('#cs-cap').textContent = `投資額が持分より ${yen(-gw)} 少ない。この差額は「負ののれん発生益」として利益にする。`;
+  }else{
+    $('#cs-cap').textContent = '投資額と持分がちょうど同じなので、のれんは生じない。';
+  }
+  await sleep(1500); if(!ok()) return;
+  ['#cs-P', '#cs-S'].forEach(sel => { const st = document.createElement('div'); st.className = 'stamp'; st.textContent = '相殺'; $(sel).appendChild(st); });
+  await raf(); $$('#c6 .stamp').forEach(s => s.classList.add('on'));
+  await sleep(700); if(!ok()) return;
+  $('#cs-colP').classList.add('off'); $('#cs-colS').classList.add('off');
+  $('#cs-cap').textContent = '子会社株式とS社の資本を消し、のれんと非支配株主持分だけが連結B/Sに残る。';
+  const dr = [['資本金', cap], ['利益剰余金', re]], cr = [['子会社株式', cost]];
+  if(gw > 0) dr.push(['のれん', gw]);
+  if(nci > 0) cr.push(['非支配株主持分', nci]);
+  if(gw < 0) cr.push(['負ののれん発生益', -gw]);
+  $('#cs-jt').innerHTML = journalTable(dr, cr);
+}
+
+/* ===================== k1 原価の流れ ===================== */
+const CF_ACCTS = ['材料','賃金','経費','製造間接費','仕掛品','製品','売上原価'];
+const CF_OPEN = {'材料':[['前月繰越',30000],['買掛金',340000]], '賃金':[['普通預金',260000]], '経費':[['諸口',110000]], '仕掛品':[['前月繰越',40000]], '製品':[['前月繰越',80000]]};
+const CF = [
+  {cap:'① 材料の消費：直接材料費 300,000 は仕掛品へ、補助材料などの間接材料費 50,000 は製造間接費へ。', l:[['仕掛品','材料',300000],['製造間接費','材料',50000]]},
+  {cap:'② 賃金の消費：直接作業分 200,000 は仕掛品へ、間接作業分 60,000 は製造間接費へ。', l:[['仕掛品','賃金',200000],['製造間接費','賃金',60000]]},
+  {cap:'③ 経費の消費：外注加工賃 20,000 は仕掛品へ、電力料・減価償却費など 90,000 は製造間接費へ。', l:[['仕掛品','経費',20000],['製造間接費','経費',90000]]},
+  {cap:'④ 製造間接費の配賦：集まった 50,000＋60,000＋90,000 ＝ 200,000 を仕掛品へ。', l:[['仕掛品','製造間接費',200000]]},
+  {cap:'⑤ 完成：仕掛品 40,000＋720,000 ＝ 760,000 から月末仕掛品 60,000 を引いた 700,000 が完成品原価。', l:[['製品','仕掛品',700000]]},
+  {cap:'⑥ 販売：製品 80,000＋700,000 ＝ 780,000 から月末製品 100,000 を引いた 680,000 が売上原価。', l:[['売上原価','製品',680000]]}
+];
+const SCF = {i:0, busy:false, run:0};
+INIT.k1 = () => { cfRender(0); };
+function cfJournal(){
+  let rows = '';
+  CF.forEach((s, i) => s.l.forEach((l, j) => {
+    rows += `<tr data-s="${i+1}"><td>${j ? '' : '①②③④⑤⑥'[i]}</td><td class="dr">${l[0]}</td><td class="n num dr">${yen(l[2])}</td><td class="cr">${l[1]}</td><td class="n num cr">${yen(l[2])}</td></tr>`;
+  }));
+  $('#cf-journal').innerHTML = `<thead><tr><th></th><th class="dr">借方</th><th class="dr n">金額</th><th class="cr">貸方</th><th class="cr n">金額</th></tr></thead><tbody>${rows}</tbody>`;
+}
+function cfRender(i){
+  SCF.i = i;
+  cfJournal();
+  const map = $('#cf-map'); map.innerHTML = '';
+  const T = {};
+  CF_ACCTS.forEach(a => { const t = tAcct(a); map.appendChild(t); T[a] = t; (CF_OPEN[a] || []).forEach(e => tAdd($('.tl', t), e[0], e[1])); });
+  for(let k=0;k<i;k++) CF[k].l.forEach(l => { tAdd($('.tl', T[l[0]]), l[1], l[2]); tAdd($('.tr', T[l[1]]), l[0], l[2]); });
+  CF_ACCTS.forEach(a => tBalance(T[a]));
+  $$('#cf-journal tr[data-s]').forEach(r => { r.classList.toggle('active', +r.dataset.s === i); r.style.opacity = +r.dataset.s <= i ? 1 : .35; });
+  $('#cf-cap').textContent = i ? CF[i-1].cap : '月初の状態。材料・賃金・経費の借方に当月の購入・支払が記入されています。「次の仕訳」で1つずつ進めてください。';
+  if(i === CF.length) $('#cf-cap').textContent = '完了。月末の残高：材料 20,000、仕掛品 60,000、製品 100,000。売上原価 680,000 が損益計算書へ。';
+  $('#cf-step').textContent = `${i} / ${CF.length}`;
+  $('#cf-prev').disabled = i === 0; $('#cf-next').disabled = i === CF.length;
+  SCF.T = T;
+}
+async function cfNext(){
+  if(SCF.busy || SCF.i >= CF.length) return false;
+  SCF.busy = true;
+  const s = CF[SCF.i], T = SCF.T, token = SCF.run;
+  $$('#cf-journal tr[data-s]').forEach(r => r.classList.toggle('active', +r.dataset.s === SCF.i + 1));
+  $$(`#cf-journal tr[data-s="${SCF.i+1}"]`).forEach(r => r.style.opacity = 1);
+  $('#cf-cap').textContent = s.cap;
+  for(const l of s.l){
+    T[l[1]].classList.add('glow');
+    await fly($('.tr', T[l[1]]), $('.tl', T[l[0]]), `${l[0]} ${yen(l[2])}`, 'ok');
+    if(token !== SCF.run){ SCF.busy = false; return false; }
+    tAdd($('.tl', T[l[0]]), l[1], l[2]); tAdd($('.tr', T[l[1]]), l[0], l[2]);
+    tBalance(T[l[0]]); tBalance(T[l[1]]);
+    T[l[1]].classList.remove('glow');
+  }
+  SCF.i++;
+  $('#cf-step').textContent = `${SCF.i} / ${CF.length}`;
+  $('#cf-prev').disabled = false; $('#cf-next').disabled = SCF.i === CF.length;
+  if(SCF.i === CF.length) $('#cf-cap').textContent = '完了。月末の残高：材料 20,000、仕掛品 60,000、製品 100,000。売上原価 680,000 が損益計算書へ。';
+  SCF.busy = false;
+  return true;
+}
+$('#cf-next').addEventListener('click', cfNext);
+$('#cf-prev').addEventListener('click', () => { if(!SCF.busy && SCF.i > 0){ SCF.run++; cfRender(SCF.i - 1); } });
+$('#cf-reset').addEventListener('click', () => { if(!SCF.busy){ SCF.run++; cfRender(0); } });
+$('#cf-all').addEventListener('click', async () => {
+  if(SCF.busy) return;
+  if(SCF.i >= CF.length){ SCF.run++; cfRender(0); await sleep(300); }
+  while(SCF.i < CF.length){ if(!(await cfNext())) break; await sleep(500); }
+});
+
+/* ===================== k2 材料の払出単価 ===================== */
+const LOT = [
+  {t:'1日 月初在庫：100kg（@200円）', type:'init', kg:100, p:200, d:'1日'},
+  {t:'5日 300kg を @220円で購入', type:'in', kg:300, p:220, d:'5日'},
+  {t:'10日 250kg を払い出し', type:'out', kg:250, d:'10日'},
+  {t:'20日 150kg を @225円で購入', type:'in', kg:150, p:225, d:'20日'},
+  {t:'25日 250kg を払い出し', type:'out', kg:250, d:'25日'}
+];
+const SLOT = {m:'fifo', i:0, busy:false};
+const LOT_CLS = ['a','b','c'];
+function lotSim(m, upto){
+  let lots = [], issues = [], nIn = 0;
+  for(let k=0;k<=upto;k++){
+    const s = LOT[k];
+    if(s.type === 'init' || s.type === 'in'){
+      const lot = {id:'L'+k, kg:s.kg, amt:s.kg*s.p, cls:LOT_CLS[nIn++]};
+      if(m === 'avg' && lots.length){ const a = lots[0]; lots = [{id:'M', kg:a.kg + lot.kg, amt:a.amt + lot.amt, cls:'m'}]; }
+      else lots.push(lot);
+    }else{
+      let need = s.kg, parts = [], amt = 0;
+      if(m === 'fifo'){
+        const next = [];
+        for(const l of lots){
+          const p = l.amt / l.kg, take = Math.min(need, l.kg);
+          if(take > 0){ parts.push(`${take}kg×@${yen(p)}`); amt += take * p; need -= take; }
+          if(l.kg - take > 0) next.push({id:l.id, kg:l.kg - take, amt:(l.kg - take) * p, cls:l.cls});
+        }
+        lots = next;
+      }else{
+        const l = lots[0], p = l.amt / l.kg;
+        parts.push(`${s.kg}kg×@${yen(p)}`); amt = s.kg * p;
+        lots = [{id:l.id, kg:l.kg - s.kg, amt:l.amt - amt, cls:l.cls}];
+      }
+      issues.push({d:s.d, kg:s.kg, calc:parts.join('＋'), amt});
+    }
+  }
+  return {lots, issues};
+}
+function lotSegs(lots){ return lots.map(l => ({id:l.id, kg:l.kg, cls:l.cls, label:`${l.kg}kg @${yen(l.amt / l.kg)}`})); }
+function lotDraw(segs){
+  const shelf = $('#lot-shelf'), seen = new Set();
+  segs.forEach(s => {
+    let el = $(`.lot[data-id="${s.id}"]`, shelf);
+    if(!el){ el = document.createElement('div'); el.dataset.id = s.id; el.style.width = '0%'; shelf.appendChild(el); }
+    el.className = 'lot ' + s.cls;
+    const w = s.kg / 450 * 100;
+    el.textContent = w > 13 ? s.label : '';
+    el.title = s.label;
+    shelf.appendChild(el);
+    requestAnimationFrame(() => { el.style.width = w + '%'; });
+    seen.add(s.id);
+  });
+  $$('.lot', shelf).forEach(el => { if(!seen.has(el.dataset.id)){ el.style.width = '0%'; setTimeout(() => el.remove(), RM ? 0 : 750); } });
+}
+function lotTable(issues, lots){
+  const tot = issues.reduce((s, x) => s + x.amt, 0), endKg = lots.reduce((s, l) => s + l.kg, 0), endAmt = lots.reduce((s, l) => s + l.amt, 0);
+  $('#lot-table').innerHTML = `<thead><tr><th>日付</th><th>払出数量</th><th class="l">計算</th><th>払出額（材料費）</th></tr></thead><tbody>` +
+    issues.map(x => `<tr><td>${x.d}</td><td class="num">${x.kg}kg</td><td class="l num">${x.calc}</td><td class="num">${yen(x.amt)}</td></tr>`).join('') +
+    (issues.length ? `<tr class="total"><td>合計</td><td></td><td></td><td class="num">${yen(tot)}</td></tr>` : '') + '</tbody>';
+  $('#lot-total').textContent = `在庫 ${endKg}kg ／ ${yen(endAmt)}円`;
+}
+function lotRender(){
+  const {lots, issues} = lotSim(SLOT.m, SLOT.i);
+  lotDraw(lotSegs(lots)); lotTable(issues, lots);
+  $('#lot-text').textContent = LOT[SLOT.i].t;
+  $('#lot-step').textContent = `${SLOT.i + 1} / ${LOT.length}`;
+  $('#lot-prev').disabled = SLOT.i === 0; $('#lot-next').disabled = SLOT.i === LOT.length - 1;
+  if(SLOT.i === LOT.length - 1){
+    const tot = issues.reduce((s, x) => s + x.amt, 0);
+    $('#lot-cap').textContent = SLOT.m === 'fifo' ? `先入先出法の材料費合計は ${yen(tot)}。古いものから払い出すので、月末には新しい単価の在庫が残る。` : `移動平均法の材料費合計は ${yen(tot)}。購入のたびに平均単価を計算し直す。`;
+  }
+}
+async function lotNext(){
+  if(SLOT.busy || SLOT.i >= LOT.length - 1) return;
+  SLOT.busy = true;
+  const s = LOT[SLOT.i + 1], before = lotSim(SLOT.m, SLOT.i).lots;
+  $('#lot-text').textContent = s.t;
+  if(s.type === 'out'){
+    let need = s.kg; const segs = [];
+    if(SLOT.m === 'fifo'){
+      for(const l of before){ const take = Math.min(need, l.kg); need -= take;
+        if(take > 0) segs.push({id:'T'+l.id, kg:take, cls:'take', label:`払出 ${take}kg`});
+        if(l.kg - take > 0) segs.push({id:l.id, kg:l.kg - take, cls:l.cls, label:`${l.kg - take}kg @${yen(l.amt / l.kg)}`}); }
+      $('#lot-cap').textContent = '古いもの（左）から順に払い出す。';
+    }else{
+      const l = before[0], p = l.amt / l.kg;
+      segs.push({id:'T'+l.id, kg:s.kg, cls:'take', label:`払出 ${s.kg}kg @${yen(p)}`}, {id:l.id, kg:l.kg - s.kg, cls:l.cls, label:`${l.kg - s.kg}kg @${yen(p)}`});
+      $('#lot-cap').textContent = `いまの平均単価 @${yen(p)} で払い出す。`;
+    }
+    lotDraw(segs);
+    await sleep(1100);
+  }else if(SLOT.m === 'avg'){
+    const l = before[0];
+    lotDraw([...lotSegs(before), {id:'N', kg:s.kg, cls:'c', label:`${s.kg}kg @${s.p}`}]);
+    $('#lot-cap').textContent = '購入したら、在庫と合わせて平均単価を計算し直す。';
+    await sleep(1000);
+    const after = {kg:l.kg + s.kg, amt:l.amt + s.kg * s.p};
+    $('#lot-cap').textContent = `（${yen(l.amt)}＋${yen(s.kg * s.p)}）÷（${l.kg}＋${s.kg}）kg ＝ @${yen(after.amt / after.kg)}`;
+    $(`#lot-shelf .lot[data-id="N"]`) && ($(`#lot-shelf .lot[data-id="N"]`).dataset.id = 'X');
+  }else{
+    $('#lot-cap').textContent = '購入した材料は、単価ごとに分けて棚に置く。';
+  }
+  SLOT.i++;
+  if(SLOT.m === 'avg' && s.type === 'in'){ const cap = $('#lot-cap').textContent; lotRender(); $('#lot-cap').textContent = cap; }
+  else if(s.type === 'out'){ lotRender(); if(SLOT.i < LOT.length - 1) $('#lot-cap').textContent = '払い出した分が表に入る。'; }
+  else { const cap = $('#lot-cap').textContent; lotRender(); $('#lot-cap').textContent = cap; }
+  SLOT.busy = false;
+}
+function lotReset(){ $('#lot-shelf').innerHTML = ''; SLOT.i = 0; lotRender(); $('#lot-cap').textContent = '「次へ」で取引を1つずつ進めてください。'; }
+$('#lot-next').addEventListener('click', lotNext);
+$('#lot-prev').addEventListener('click', () => { if(!SLOT.busy && SLOT.i > 0){ SLOT.i--; $('#lot-shelf').innerHTML = ''; lotRender(); $('#lot-cap').textContent = ''; } });
+$('#lot-reset').addEventListener('click', () => { if(!SLOT.busy) lotReset(); });
+$$('#lot-method button').forEach(b => b.addEventListener('click', () => {
+  if(SLOT.busy) return;
+  SLOT.m = b.dataset.m;
+  $$('#lot-method button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  lotReset();
+}));
+INIT.k2 = () => { lotReset(); };
+
+/* ===================== シュラッター図 ===================== */
+function shutterWidget(root, def, withStd){
+  const id = root.id;
+  const f = [['vr','変動費率（@円/時間）'],['fixed','固定費予算'],['base','基準操業度（時間）']];
+  if(withStd) f.push(['std','標準操業度（時間）']);
+  f.push(['act','実際操業度（時間）'],['cost','実際発生額']);
+  root.innerHTML = `<div class="stack">
+    <div class="form-row">${f.map(x => `<label>${x[1]}<input id="${id}-${x[0]}" inputmode="numeric" value="${yen(def[x[0]])}"></label>`).join('')}<button class="btn" type="button" data-play>再生</button></div>
+    <p class="err" id="${id}-err"></p>
+    <div class="sheet two">
+      <svg class="chart" viewBox="0 0 520 330" role="img" aria-label="製造間接費の差異分析図"></svg>
+      <div class="stack"><div class="vlist"></div>
+        <div class="keys"><span><i style="background:var(--s1)"></i>${withStd ? '標準配賦率の線' : '予定配賦率の線'}</span><span><i style="background:var(--s2)"></i>予算線（変動費＋固定費）</span><span><i style="background:var(--ink)"></i>実際発生額</span></div>
+        <p class="note">${withStd ? '予算差異 ＝ 予算許容額 − 実際発生額、操業度差異 ＝ 固定費率 ×（実際操業度 − 基準操業度）、能率差異 ＝ 標準配賦率 ×（標準操業度 − 実際操業度）。' : '予算差異 ＝ 予算許容額 − 実際発生額、操業度差異 ＝ 固定費率 ×（実際操業度 − 基準操業度）。'}マイナスは不利差異（借方差異）です。</p>
+      </div>
+    </div></div>`;
+  fmtInputs(root);
+  const svg = $('svg', root), list = $('.vlist', root);
+  let run = 0;
+  async function play(){
+    const v = readNums(f.map(x => `${id}-${x[0]}`), `#${id}-err`); if(!v) return;
+    const g = k => v[`${id}-${k}`];
+    const vr = g('vr'), fixed = g('fixed'), base = g('base'), act = g('act'), cost = g('cost'), std = withStd ? g('std') : null;
+    if([vr, fixed, base, act, cost].some(x => x <= 0) || (withStd && std <= 0)){ $(`#${id}-err`).textContent = '0より大きい数字を入力してください。'; return; }
+    const token = ++run, ok = () => token === run;
+    const fr = fixed / base, rate = vr + fr, allow = fixed + vr * act, applied = rate * (withStd ? std : act);
+    const vBud = allow - cost, vOp = rate * act - allow, vEff = withStd ? rate * std - rate * act : 0, vTot = applied - cost;
+    const W = 520, H = 330, m = {l:62, r:128, t:14, b:58}, pw = W - m.l - m.r, ph = H - m.t - m.b;
+    const xmax = Math.max(base, act, std || 0) * 1.25;
+    const yRaw = Math.max(cost, rate * xmax, fixed + vr * xmax), st = niceStep(yRaw, 5), ymax = Math.ceil(yRaw / st) * st;
+    const X = h => m.l + h / xmax * pw, Y = y => m.t + ph - y / ymax * ph;
+    svg.innerHTML = '';
+    for(let y=0; y<=ymax + 1e-6; y+=st){
+      sLine(svg, m.l, Y(y), m.l + pw, Y(y), y ? 'gl' : 'base');
+      svg.appendChild(S('text', {x:m.l - 6, y:Y(y) + 4, 'text-anchor':'end', class:'axn'}, fmtAxis(y)));
+    }
+    sLine(svg, m.l, m.t, m.l, m.t + ph, 'base');
+    const xs = [{h:base, t:`基準 ${yen(base)}h`}, {h:act, t:`実際 ${yen(act)}h`}];
+    if(withStd) xs.push({h:std, t:`標準 ${yen(std)}h`});
+    xs.sort((a, b) => a.h - b.h).forEach((o, i) => {
+      sLine(svg, X(o.h), m.t, X(o.h), m.t + ph, 'dash');
+      svg.appendChild(S('text', {x:X(o.h), y:m.t + ph + 15 + 13 * i, 'text-anchor':'middle', class:'ax'}, o.t));
+    });
+    svg.appendChild(S('text', {x:m.l + pw, y:H - 2, 'text-anchor':'end', class:'ax'}, '操業度（時間）→'));
+    const fixedL = sLine(svg, m.l, Y(fixed), m.l + pw, Y(fixed), 'dash');
+    const budL = sLine(svg, m.l, Y(fixed), X(xmax), Y(fixed + vr * xmax), 'st-s2 draw', {'stroke-width':2.5});
+    const rateL = sLine(svg, m.l, Y(0), X(xmax), Y(rate * xmax), 'st-s1 draw', {'stroke-width':2.5});
+    svg.appendChild(S('text', {x:m.l + 4, y:Y(fixed) - 5, class:'ax'}, `固定費 ${yen(fixed)}`));
+    const dots = [];
+    const dot = (h, y, fill) => { const c = S('circle', {cx:X(h), cy:Y(y), r:4.5, class:'fade', style:`fill:${fill};stroke:var(--sheet);stroke-width:1.5`}); svg.appendChild(c); dots.push(c); };
+    dot(act, cost, 'var(--ink)'); dot(act, allow, 'var(--s2)'); dot(act, rate * act, 'var(--s1)');
+    if(withStd){ dot(std, rate * std, 'var(--s1)'); const hl = sLine(svg, X(std), Y(rate * std), X(act), Y(rate * std), 'dash fade'); dots.push(hl); }
+    const bx = X(act) + 12, brs = [], labs = [];
+    const bracket = (y1, y2, name, val) => {
+      const g = S('g', {class:'fade'}), col = val >= 0 ? 'var(--ok)' : 'var(--ng)';
+      g.appendChild(S('line', {x1:bx, y1:Y(y1), x2:bx, y2:Y(y2), style:`stroke:${col};stroke-width:3`}));
+      g.appendChild(S('line', {x1:bx - 4, y1:Y(y1), x2:bx + 4, y2:Y(y1), style:`stroke:${col};stroke-width:2`}));
+      g.appendChild(S('line', {x1:bx - 4, y1:Y(y2), x2:bx + 4, y2:Y(y2), style:`stroke:${col};stroke-width:2`}));
+      svg.appendChild(g); brs.push(g);
+      labs.push({y:(Y(y1) + Y(y2)) / 2 + 4, name, val, col, g});
+    };
+    bracket(cost, allow, '予算差異', vBud);
+    bracket(allow, rate * act, '操業度差異', vOp);
+    if(withStd) bracket(rate * act, rate * std, '能率差異', vEff);
+    const lx = m.l + pw + 18;
+    labs.forEach(o => o.y0 = o.y);
+    spreadLabels(labs, 34).forEach(o => {
+      o.g.appendChild(S('line', {x1:bx + 5, y1:o.y0 - 4, x2:lx - 4, y2:o.y - 2, style:`stroke:${o.col};stroke-width:1`}));
+      o.g.appendChild(S('text', {x:lx, y:o.y - 6, class:'lbl', style:`fill:${o.col}`}, o.name));
+      o.g.appendChild(S('text', {x:lx, y:o.y + 9, class:'lbln', style:`fill:${o.col}`}, signed(Math.round(o.val))));
+    });
+    list.innerHTML = `<div><span>${withStd ? '標準配賦率' : '予定配賦率'}（${yen(vr)}＋${yen(fixed)}÷${yen(base)}）</span><b class="num">@${yen(rate)}</b></div>
+      <div><span>${withStd ? '標準配賦額' : '予定配賦額'}（@${yen(rate)}×${yen(withStd ? std : act)}h）</span><b class="num">${yen(applied)}</b></div>
+      <div><span>予算許容額（${yen(vr)}×${yen(act)}h＋${yen(fixed)}）</span><b class="num">${yen(allow)}</b></div>
+      <div><span>実際発生額</span><b class="num">${yen(cost)}</b></div>
+      <div><span>予算差異${favTag(vBud)}</span><b class="num">${signed(Math.round(vBud))}</b></div>
+      <div><span>操業度差異${favTag(vOp)}</span><b class="num">${signed(Math.round(vOp))}</b></div>
+      ${withStd ? `<div><span>能率差異${favTag(vEff)}</span><b class="num">${signed(Math.round(vEff))}</b></div>` : ''}
+      <div class="tot"><span>${withStd ? '総差異' : '配賦差異'}${favTag(vTot)}</span><b class="num">${signed(Math.round(vTot))}</b></div>`;
+    await turnOn([rateL, budL], 500); await sleep(800); if(!ok()) return;
+    await turnOn(dots); await sleep(600); if(!ok()) return;
+    for(const b of brs){ b.classList.add('on'); await sleep(700); if(!ok()) return; }
+  }
+  $('[data-play]', root).addEventListener('click', play);
+  return {play};
+}
+let OHW = null;
+INIT.k3 = () => { OHW = shutterWidget($('#oh-widget'), {vr:300, fixed:500000, base:1000, act:900, cost:790000}, false); OHW.play(); dpPlay(); };
+
+/* ===================== k3 部門費配賦 ===================== */
+const DP_COLS = ['合計','切削部','組立部','動力部','修繕部'];
+const DP = {
+  direct: [
+    {label:'部門費', v:{0:900000,1:400000,2:300000,3:120000,4:80000}, cap:'部門個別費と部門共通費を配った後の各部門の費用。'},
+    {label:'動力部費', src:3, v:{1:75000,2:45000}, cap:'動力部 120,000 を、切削部と組立部だけで 50:30 に分ける（修繕部への供給は無視）。'},
+    {label:'修繕部費', src:4, v:{1:40000,2:40000}, cap:'修繕部 80,000 を、切削部と組立部だけで 40:40 に分ける。'},
+    {label:'製造部門費', total:true, v:{0:900000,1:515000,2:385000}, cap:'補助部門費がすべて製造部門に移った。合計 900,000 は変わらない。'}
+  ],
+  recip: [
+    {label:'部門費', v:{0:900000,1:400000,2:300000,3:120000,4:80000}, cap:'部門個別費と部門共通費を配った後の各部門の費用。'},
+    {label:'第1次配賦　動力部費', src:3, v:{1:60000,2:36000,4:24000}, cap:'第1次：動力部 120,000 を、修繕部も含めて 50:30:20 で配る。'},
+    {label:'第1次配賦　修繕部費', src:4, v:{1:32000,2:32000,3:16000}, cap:'第1次：修繕部 80,000 を、動力部も含めて 40:40:20 で配る。'},
+    {label:'第2次配賦　動力部費', src:3, v:{1:10000,2:6000}, cap:'第2次：動力部が受け取った 16,000 は、直接配賦法と同じく製造部門だけに 50:30 で配る。'},
+    {label:'第2次配賦　修繕部費', src:4, v:{1:12000,2:12000}, cap:'第2次：修繕部が受け取った 24,000 を、製造部門だけに 40:40 で配る。'},
+    {label:'製造部門費', total:true, v:{0:900000,1:514000,2:386000}, cap:'相互配賦法（簡便法）の結果。直接配賦法より、補助部門どうしのやりとりが反映される。'}
+  ]
+};
+const SDP = {m:'direct', run:0};
+$('#dp-ratio').innerHTML = `<thead><tr><th>配賦基準</th><th>切削部</th><th>組立部</th><th>動力部</th><th>修繕部</th></tr></thead><tbody>
+  <tr><td>動力部（電力消費量の割合）</td><td class="num">50%</td><td class="num">30%</td><td>―</td><td class="num">20%</td></tr>
+  <tr><td>修繕部（修繕時間の割合）</td><td class="num">40%</td><td class="num">40%</td><td class="num">20%</td><td>―</td></tr></tbody>`;
+async function dpPlay(){
+  const token = ++SDP.run, ok = () => token === SDP.run, rows = DP[SDP.m];
+  $('#dp-table').innerHTML = `<thead><tr><th>摘要</th>${DP_COLS.map((c, i) => `<th class="n" data-c="${i}">${c}</th>`).join('')}</tr></thead><tbody>` +
+    rows.map((r, ri) => `<tr data-r="${ri}" class="${r.total ? 'total' : ''}"><td>${r.label}</td>${DP_COLS.map((c, i) => `<td class="n num" data-c="${i}"></td>`).join('')}</tr>`).join('') + '</tbody>';
+  for(let ri=0; ri<rows.length; ri++){
+    const r = rows[ri], tr = $(`#dp-table tr[data-r="${ri}"]`);
+    $('#dp-cap').textContent = r.cap;
+    if(r.src != null){
+      const srcCell = $(`#dp-table thead th[data-c="${r.src}"]`);
+      $$(`#dp-table td[data-c="${r.src}"]`).forEach(td => td.classList.add('src'));
+      for(const c in r.v){
+        const td = $(`td[data-c="${c}"]`, tr);
+        await fly(srcCell, td, yen(r.v[c]), 'ok'); if(!ok()) return;
+        td.textContent = yen(r.v[c]); td.classList.add('pop');
+      }
+      $$(`#dp-table td[data-c="${r.src}"]`).forEach(td => td.classList.remove('src'));
+    }else{
+      for(const c in r.v){ const td = $(`td[data-c="${c}"]`, tr); td.textContent = yen(r.v[c]); td.classList.add('pop'); }
+    }
+    await sleep(r.src != null ? 700 : 900); if(!ok()) return;
+  }
+}
+$('#dp-play').addEventListener('click', dpPlay);
+$$('#dp-method button').forEach(b => b.addEventListener('click', () => {
+  SDP.m = b.dataset.m;
+  $$('#dp-method button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  dpPlay();
+}));
+
+/* ===================== k4 個別原価計算 ===================== */
+const JO = [
+  {no:'#101', beg:50000, dm:0, dl:30000, h:20, st:'完成・引渡済', to:'cogs'},
+  {no:'#102', beg:0, dm:120000, dl:60000, h:40, st:'完成・未引渡', to:'fg'},
+  {no:'#103', beg:0, dm:80000, dl:30000, h:20, st:'未完成', to:'wip'}
+];
+const SJO = {run:0};
+INIT.k4 = () => { joPlay(); pcPlay(); };
+async function joPlay(){
+  const token = ++SJO.run, ok = () => token === SJO.run;
+  const cols = [['beg','前月繰越'],['dm','直接材料費'],['dl','直接労務費'],['oh','製造間接費'],['sum','合計'],['st','月末の状態']];
+  $('#jo-table').innerHTML = `<thead><tr><th>製造指図書</th>${cols.map(c => `<th>${c[1]}</th>`).join('')}</tr></thead><tbody>` +
+    JO.map((j, i) => `<tr data-i="${i}"><td><b>${j.no}</b></td>${cols.map(c => `<td class="num" data-c="${c[0]}"></td>`).join('')}</tr>`).join('') + '</tbody>';
+  $$('#jo-dest > div').forEach(d => $$('.badge', d).forEach(b => b.remove()));
+  const caps = {beg:'前月から作りかけの #101 には、前月までの原価 50,000 がある。', dm:'材料の出庫票から、指図書ごとに直接材料費を集計する。', dl:'作業時間報告書から、指図書ごとに直接労務費を集計する（@1,500円/時間）。', oh:'製造間接費は直接作業時間 × 予定配賦率 @1,000円 で配賦する。', sum:'指図書ごとの合計が、その注文の製造原価。', st:'月末の状態で、どの勘定に入るかが決まる。'};
+  for(const [c] of cols){
+    $('#jo-cap').textContent = caps[c];
+    JO.forEach((j, i) => {
+      const td = $(`#jo-table tr[data-i="${i}"] td[data-c="${c}"]`);
+      const val = c === 'oh' ? j.h * 1000 : c === 'sum' ? j.beg + j.dm + j.dl + j.h * 1000 : j[c];
+      td.innerHTML = c === 'st' ? `<span style="font-family:var(--f-body)">${j.st}</span>` : c === 'oh' ? `${yen(val)}<span class="note">（${j.h}h）</span>` : (val ? yen(val) : '―');
+      td.classList.remove('pop'); void td.offsetWidth; td.classList.add('pop');
+    });
+    await sleep(1000); if(!ok()) return;
+  }
+  const names = {wip:'仕掛品', fg:'製品', cogs:'売上原価'};
+  for(const j of JO){
+    const sum = j.beg + j.dm + j.dl + j.h * 1000, box = $(`#jo-dest [data-d="${j.to}"]`);
+    await fly($(`#jo-table tr[data-i="${JO.indexOf(j)}"] td[data-c="sum"]`), box, `${j.no} ${yen(sum)}`, 'ok'); if(!ok()) return;
+    box.insertAdjacentHTML('beforeend', `<span class="badge"><b>${j.no}</b><span class="num">${yen(sum)}</span></span>`);
+    $('#jo-cap').textContent = `${j.no} は「${j.st}」なので${names[j.to]}へ。`;
+    await sleep(500); if(!ok()) return;
+  }
+  $('#jo-cap').textContent = '当月の完成品原価は #101＋#102 ＝ 320,000。月末仕掛品は #103 の 130,000。';
+}
+$('#jo-play').addEventListener('click', joPlay);
+
+/* ===================== k4 総合原価計算 ===================== */
+const PC = {
+  mat:{name:'直接材料費（始点投入）', unit:'個', beg:{u:200, c:34000}, inn:{u:1000, c:230000}, fin:{u:1000}, end:{u:200}},
+  conv:{name:'加工費（完成品換算量）', unit:'個', beg:{u:100, c:24600}, inn:{u:980, c:294000}, fin:{u:1000}, end:{u:80}}
+};
+const SPC = {m:'avg', run:0};
+function pcCalc(b, m){
+  if(m === 'avg'){
+    const end = (b.beg.c + b.inn.c) / (b.fin.u + b.end.u) * b.end.u;
+    return {end, fin:b.beg.c + b.inn.c - end, f:`（${yen(b.beg.c)}＋${yen(b.inn.c)}）÷（${yen(b.fin.u)}＋${yen(b.end.u)}）× ${yen(b.end.u)}`};
+  }
+  const end = b.inn.c / b.inn.u * b.end.u;
+  return {end, fin:b.beg.c + b.inn.c - end, f:`${yen(b.inn.c)} ÷ ${yen(b.inn.u)} × ${yen(b.end.u)}`};
+}
+async function pcPlay(){
+  const token = ++SPC.run, ok = () => token === SPC.run;
+  const cell = (k, label, u, c, grow) => `<div class="pc" data-k="${k}" style="flex-grow:${grow}"><span>${label} <span class="num">${yen(u)}</span></span><span class="v num ${c != null ? 'on' : ''}">${c != null ? yen(c) : ''}</span></div>`;
+  $('#pc-boxes').innerHTML = ['mat','conv'].map(k => { const b = PC[k]; return `<div class="pbox" data-b="${k}"><h4>${b.name}</h4><div class="pbox-in">
+    <div class="pcol">${cell('beg','月初', b.beg.u, b.beg.c, b.beg.u)}${cell('inn','当月投入', b.inn.u, b.inn.c, b.inn.u)}</div>
+    <div class="pcol">${cell('fin','完成品', b.fin.u, null, b.fin.u)}${cell('end','月末', b.end.u, null, b.end.u)}</div></div></div>`; }).join('');
+  $('#pc-sum').innerHTML = '';
+  $('#pc-cap').textContent = SPC.m === 'avg' ? '平均法：月初仕掛品と当月投入を混ぜて、平均単価で月末仕掛品を評価する。' : '先入先出法：月初仕掛品から先に完成させるので、月末仕掛品は当月投入分だけからできている。';
+  if(SPC.m === 'fifo') $('#pc-cap').textContent += ' 加工費の当月投入換算量は 1,000−100＋80＝980個。';
+  await sleep(1400); if(!ok()) return;
+  const res = {};
+  for(const k of ['mat','conv']){
+    const b = PC[k], r = pcCalc(b, SPC.m), box = $(`#pc-boxes [data-b="${k}"]`);
+    res[k] = r;
+    const e = $('.pc[data-k="end"]', box), fi = $('.pc[data-k="fin"]', box);
+    if(SPC.m === 'fifo') $('.pc[data-k="inn"]', box).classList.add('lit'); else { $('.pc[data-k="beg"]', box).classList.add('lit'); $('.pc[data-k="inn"]', box).classList.add('lit'); }
+    e.classList.add('lit');
+    $('#pc-cap').textContent = `${b.name}の月末仕掛品：${r.f} ＝ ${yen(r.end)}`;
+    const ev = $('.v', e); ev.textContent = yen(r.end); ev.classList.add('on');
+    await sleep(1700); if(!ok()) return;
+    $$('.pc', box).forEach(x => x.classList.remove('lit'));
+    fi.classList.add('lit');
+    const fv = $('.v', fi); fv.textContent = yen(r.fin); fv.classList.add('on');
+    $('#pc-cap').textContent = `完成品：月初＋当月投入 − 月末 ＝ ${yen(b.beg.c + b.inn.c)} − ${yen(r.end)} ＝ ${yen(r.fin)}`;
+    await sleep(1500); if(!ok()) return;
+    fi.classList.remove('lit');
+  }
+  const fin = res.mat.fin + res.conv.fin, end = res.mat.end + res.conv.end;
+  $('#pc-sum').innerHTML = `<div><span>完成品総合原価</span><b class="num">${yen(fin)}</b></div><div><span>完成品単位原価（÷1,000個）</span><b class="num">@${yen(fin / 1000)}</b></div><div class="tot"><span>月末仕掛品原価</span><b class="num">${yen(end)}</b></div>`;
+  $('#pc-cap').textContent = SPC.m === 'avg' ? '平均法の結果。先入先出法に切り替えて比べてみてください。' : '先入先出法の結果。平均法と比べて、月末仕掛品が当月の単価で評価されている。';
+}
+$('#pc-play').addEventListener('click', pcPlay);
+$$('#pc-method button').forEach(b => b.addEventListener('click', () => {
+  SPC.m = b.dataset.m;
+  $$('#pc-method button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  pcPlay();
+}));
+
+/* ===================== k5 標準原価：差異分析 ===================== */
+const SV = {
+  mat:{l:['標準価格（@円）','標準消費量（kg）','実際価格（@円）','実際消費量（kg）'], sp:100, sq:2500, ap:105, aq:2600, u:'kg', pn:'価格差異', qn:'数量差異', pa:'価格', qa:'消費量'},
+  lab:{l:['標準賃率（@円）','標準作業時間（時間）','実際賃率（@円）','実際作業時間（時間）'], sp:1200, sq:1000, ap:1180, aq:1050, u:'h', pn:'賃率差異', qn:'時間差異', pa:'賃率', qa:'作業時間'}
+};
+const SSV = {v:'mat', run:0};
+let SVOH = null;
+INIT.k5 = () => { svLoad('mat'); svPlay(); };
+function svLoad(k){
+  const d = SV[k];
+  ['sv-l1','sv-l2','sv-l3','sv-l4'].forEach((id, i) => $('#' + id).textContent = d.l[i]);
+  $('#sv-sp').value = yen(d.sp); $('#sv-sq').value = yen(d.sq); $('#sv-ap').value = yen(d.ap); $('#sv-aq').value = yen(d.aq);
+}
+async function svPlay(){
+  const v = readNums(['sv-sp','sv-sq','sv-ap','sv-aq'], '#sv-err'); if(!v) return;
+  const sp = v['sv-sp'], sq = v['sv-sq'], ap = v['sv-ap'], aq = v['sv-aq'], d = SV[SSV.v];
+  if([sp, sq, ap, aq].some(x => x <= 0)){ $('#sv-err').textContent = '0より大きい数字を入力してください。'; return; }
+  const token = ++SSV.run, ok = () => token === SSV.run;
+  const pv = (sp - ap) * aq, qv = sp * (sq - aq), tot = sp * sq - ap * aq;
+  const svg = $('#sv-svg'); svg.innerHTML = '';
+  const W = 520, H = 300, m = {l:70, r:104, t:28, b:46}, pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const qmax = Math.max(sq, aq) * 1.1, pmax = Math.max(sp, ap) * 1.15;
+  const X = q => m.l + q / qmax * pw, Y = p => m.t + ph - p / pmax * ph;
+  sLine(svg, m.l, m.t + ph, m.l + pw, m.t + ph, 'base'); sLine(svg, m.l, m.t, m.l, m.t + ph, 'base');
+  const stdR = S('rect', {x:X(0), y:Y(sp), width:X(sq) - X(0), height:Y(0) - Y(sp), class:'grow', style:'fill:var(--e-asset);stroke:var(--debit);stroke-width:1.5'});
+  svg.appendChild(stdR);
+  const stdT = S('text', {x:(X(0) + X(Math.min(sq, aq))) / 2, y:(Y(sp) + Y(0)) / 2, 'text-anchor':'middle', class:'lbl fade'}, '標準原価');
+  const stdN = S('text', {x:(X(0) + X(Math.min(sq, aq))) / 2, y:(Y(sp) + Y(0)) / 2 + 17, 'text-anchor':'middle', class:'lbln fade'}, yen(sp * sq));
+  svg.append(stdT, stdN);
+  const col = val => val >= 0 ? ['var(--ok-tint)', 'var(--ok)'] : ['var(--ng-tint)', 'var(--ng)'];
+  const [pf, ps] = col(pv), [qf, qs] = col(qv);
+  const pR = S('rect', {x:X(0), y:Y(Math.max(sp, ap)), width:X(aq) - X(0), height:Math.abs(Y(sp) - Y(ap)), class:'fade', style:`fill:${pf};stroke:${ps};stroke-width:1.5`});
+  const qR = S('rect', {x:X(Math.min(sq, aq)), y:Y(sp), width:Math.abs(X(aq) - X(sq)), height:Y(0) - Y(sp), class:'fade', style:`fill:${qf};stroke:${qs};stroke-width:1.5`});
+  const actR = S('rect', {x:X(0), y:Y(ap), width:X(aq) - X(0), height:Y(0) - Y(ap), class:'fade', style:'fill:none;stroke:var(--ink);stroke-width:1.5;stroke-dasharray:5 4'});
+  svg.append(pR, qR, actR);
+  const pL = S('g', {class:'fade'}), qL = S('g', {class:'fade'});
+  pL.appendChild(S('text', {x:(X(0) + X(aq)) / 2, y:Y(Math.max(sp, ap)) - 16, 'text-anchor':'middle', class:'lbl', style:`fill:${ps}`}, d.pn));
+  pL.appendChild(S('text', {x:(X(0) + X(aq)) / 2, y:Y(Math.max(sp, ap)) - 3, 'text-anchor':'middle', class:'lbln', style:`fill:${ps}`}, signed(pv)));
+  qL.appendChild(S('text', {x:X(Math.max(sq, aq)) + 6, y:(Y(sp) + Y(0)) / 2 - 4, class:'lbl', style:`fill:${qs}`}, d.qn));
+  qL.appendChild(S('text', {x:X(Math.max(sq, aq)) + 6, y:(Y(sp) + Y(0)) / 2 + 12, class:'lbln', style:`fill:${qs}`}, signed(qv)));
+  svg.append(pL, qL);
+  const yl = spreadLabels([{y:Y(sp) + 4, t:`標準 @${yen(sp)}`}, {y:Y(ap) + 4, t:`実際 @${yen(ap)}`}], 13);
+  yl.forEach(o => svg.appendChild(S('text', {x:m.l - 6, y:o.y, 'text-anchor':'end', class:'axn'}, o.t)));
+  const xl = [{x:X(sq), t:`標準 ${yen(sq)}${d.u}`}, {x:X(aq), t:`実際 ${yen(aq)}${d.u}`}].sort((a, b) => a.x - b.x);
+  xl.forEach((o, i) => { sLine(svg, o.x, m.t + ph, o.x, m.t + ph + 4, 'base'); svg.appendChild(S('text', {x:o.x, y:m.t + ph + 16 + 13 * i, 'text-anchor': i ? 'start' : 'end', class:'axn'}, o.t)); });
+  svg.appendChild(S('text', {x:m.l - 6, y:m.t - 12, 'text-anchor':'end', class:'ax'}, d.pa + ' ↑'));
+  svg.appendChild(S('text', {x:m.l + pw + 4, y:m.t + ph + 4, class:'ax'}, d.qa + ' →'));
+  $('#sv-list').innerHTML = `<div><span>標準原価（@${yen(sp)}×${yen(sq)}）</span><b class="num">${yen(sp * sq)}</b></div>
+    <div><span>実際原価（@${yen(ap)}×${yen(aq)}）</span><b class="num">${yen(ap * aq)}</b></div>
+    <div><span>${d.pn}（${yen(sp)}−${yen(ap)}）×${yen(aq)}${favTag(pv)}</span><b class="num">${signed(pv)}</b></div>
+    <div><span>${d.qn} ${yen(sp)}×（${yen(sq)}−${yen(aq)}）${favTag(qv)}</span><b class="num">${signed(qv)}</b></div>
+    <div class="tot"><span>総差異${favTag(tot)}</span><b class="num">${signed(tot)}</b></div>`;
+  $('#sv-cap').textContent = '内側の長方形が標準原価。';
+  await turnOn([stdR, stdT, stdN]); await sleep(900); if(!ok()) return;
+  actR.classList.add('on'); $('#sv-cap').textContent = '点線が実際原価。はみ出した（足りない）部分が差異。';
+  await sleep(1000); if(!ok()) return;
+  pR.classList.add('on'); pL.classList.add('on'); $('#sv-cap').textContent = `${d.pn}：価格の差 × 実際の${d.qa}`;
+  await sleep(1100); if(!ok()) return;
+  qR.classList.add('on'); qL.classList.add('on'); $('#sv-cap').textContent = `${d.qn}：標準の${d.pa} × ${d.qa}の差`;
+}
+$('#sv-play').addEventListener('click', svPlay);
+$$('#sv-tabs button').forEach(b => b.addEventListener('click', () => {
+  $$('#sv-tabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  const k = b.dataset.v;
+  $('#sv-rect').hidden = k === 'oh'; $('#sv-oh').hidden = k !== 'oh';
+  if(k === 'oh'){
+    if(!SVOH) SVOH = shutterWidget($('#sv-oh-widget'), {vr:600, fixed:990000, base:1100, std:1000, act:1050, cost:1640000}, true);
+    SVOH.play();
+  }else{ SSV.v = k; svLoad(k); svPlay(); }
+}));
+
+/* ===================== k6 CVP ===================== */
+const SCV = {run:0, timer:0};
+INIT.k6 = () => { cvpPlay(true); abPlay(); };
+function cvpRead(){
+  const v = readNums(['cv-p','cv-v','cv-f','cv-q','cv-t'], '#cv-err'); if(!v) return null;
+  const o = {p:v['cv-p'], v:v['cv-v'], f:v['cv-f'], q:v['cv-q'], t:v['cv-t']};
+  if(o.p <= 0 || o.v < 0 || o.f <= 0 || o.q <= 0 || o.t < 0){ $('#cv-err').textContent = '0より大きい数字を入力してください。'; return null; }
+  if(o.v >= o.p){ $('#cv-err').textContent = '変動費が販売単価以上だと、いくら売っても利益が出ません。変動費を単価より小さくしてください。'; return null; }
+  return o;
+}
+async function cvpPlay(anim){
+  const o = cvpRead(); if(!o) return;
+  const token = ++SCV.run, ok = () => token === SCV.run;
+  const cm = o.p - o.v, bq = o.f / cm, bs = bq * o.p, sales = o.p * o.q, op = cm * o.q - o.f, mos = (sales - bs) / sales * 100, tq = (o.f + o.t) / cm;
+  const svg = $('#cv-svg'); svg.innerHTML = '';
+  const W = 520, H = 320, m = {l:66, r:16, t:16, b:40}, pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const xRaw = Math.max(o.q, bq) * 1.35, xs = niceStep(xRaw, 5), xmax = Math.ceil(xRaw / xs) * xs;
+  const yRaw = o.p * xmax, ys = niceStep(yRaw, 5), ymax = Math.ceil(yRaw / ys) * ys;
+  const X = q => m.l + q / xmax * pw, Y = y => m.t + ph - y / ymax * ph;
+  for(let y=0; y<=ymax + 1e-6; y+=ys){ sLine(svg, m.l, Y(y), m.l + pw, Y(y), y ? 'gl' : 'base'); svg.appendChild(S('text', {x:m.l - 6, y:Y(y) + 4, 'text-anchor':'end', class:'axn'}, fmtAxis(y))); }
+  for(let x=xs; x<=xmax + 1e-6; x+=xs) svg.appendChild(S('text', {x:X(x), y:m.t + ph + 15, 'text-anchor':'middle', class:'axn'}, yen(x)));
+  svg.appendChild(S('text', {x:m.l + pw, y:H - 4, 'text-anchor':'end', class:'ax'}, '販売量（個）→'));
+  sLine(svg, m.l, m.t, m.l, m.t + ph, 'base');
+  const lossA = S('polygon', {points:`${X(0)},${Y(0)} ${X(0)},${Y(o.f)} ${X(bq)},${Y(bs)}`, class:'fade', style:'fill:var(--ng-tint)'});
+  const profA = S('polygon', {points:`${X(bq)},${Y(bs)} ${X(xmax)},${Y(o.p * xmax)} ${X(xmax)},${Y(o.f + o.v * xmax)}`, class:'fade', style:'fill:var(--ok-tint)'});
+  svg.append(lossA, profA);
+  sLine(svg, m.l, Y(o.f), m.l + pw, Y(o.f), 'dash');
+  svg.appendChild(S('text', {x:m.l + pw - 4, y:Y(o.f) + 14, 'text-anchor':'end', class:'ax'}, `固定費 ${yen(o.f)}`));
+  const costL = sLine(svg, X(0), Y(o.f), X(xmax), Y(o.f + o.v * xmax), 'st-s2' + (anim ? ' draw' : ''), {'stroke-width':2.5});
+  const revL = sLine(svg, X(0), Y(0), X(xmax), Y(o.p * xmax), 'st-s1' + (anim ? ' draw' : ''), {'stroke-width':2.5});
+  const qG = S('g', {class:'fade'});
+  const yR = Y(sales), yC = Y(o.f + o.v * o.q);
+  qG.appendChild(S('line', {x1:X(o.q), y1:m.t + ph, x2:X(o.q), y2:Math.min(yR, yC), class:'dash'}));
+  qG.appendChild(S('line', {x1:X(o.q), y1:yR, x2:X(o.q), y2:yC, style:`stroke:${op >= 0 ? 'var(--ok)' : 'var(--ng)'};stroke-width:4`}));
+  const lx = X(o.q) > m.l + pw * 0.7 ? X(o.q) - 8 : X(o.q) + 8, anc = X(o.q) > m.l + pw * 0.7 ? 'end' : 'start';
+  qG.appendChild(S('text', {x:lx, y:(yR + yC) / 2 - 2, 'text-anchor':anc, class:'lbl', style:`fill:${op >= 0 ? 'var(--ok)' : 'var(--ng)'}`}, op >= 0 ? '営業利益' : '営業損失'));
+  qG.appendChild(S('text', {x:lx, y:(yR + yC) / 2 + 13, 'text-anchor':anc, class:'lbln', style:`fill:${op >= 0 ? 'var(--ok)' : 'var(--ng)'}`}, yen(Math.abs(op))));
+  svg.appendChild(qG);
+  const bG = S('g', {class:'fade'});
+  bG.appendChild(S('circle', {cx:X(bq), cy:Y(bs), r:6, style:'fill:var(--sheet);stroke:var(--ink);stroke-width:2.5'}));
+  const bxl = X(bq) < m.l + 120 ? X(bq) + 10 : X(bq) - 10, banc = X(bq) < m.l + 120 ? 'start' : 'end';
+  bG.appendChild(S('text', {x:bxl, y:Y(bs) - 22, 'text-anchor':banc, class:'lbl'}, '損益分岐点'));
+  bG.appendChild(S('text', {x:bxl, y:Y(bs) - 8, 'text-anchor':banc, class:'lbln'}, `${yen(Math.round(bq * 100) / 100)}個／${yen(Math.round(bs))}円`));
+  svg.appendChild(bG);
+  $('#cv-list').innerHTML = `<div><span>貢献利益（1個あたり）${yen(o.p)}−${yen(o.v)}</span><b class="num">${yen(cm)}</b></div>
+    <div><span>貢献利益率</span><b class="num">${yen(Math.round(cm / o.p * 1000) / 10)}%</b></div>
+    <div><span>損益分岐点販売量 ${yen(o.f)}÷${yen(cm)}</span><b class="num">${yen(Math.round(bq * 100) / 100)}個</b></div>
+    <div><span>損益分岐点売上高</span><b class="num">${yen(Math.round(bs))}</b></div>
+    <div><span>売上高（${yen(o.q)}個）</span><b class="num">${yen(sales)}</b></div>
+    <div><span>営業利益</span><b class="num">${op < 0 ? '△' : ''}${yen(Math.abs(op))}</b></div>
+    <div><span>安全余裕率（売上高−損益分岐点売上高）÷売上高</span><b class="num">${yen(Math.round(mos * 10) / 10)}%</b></div>
+    <div class="tot"><span>目標営業利益 ${yen(o.t)} の販売量（${yen(o.f)}＋${yen(o.t)}）÷${yen(cm)}</span><b class="num">${yen(Math.ceil(tq * 100) / 100)}個</b></div>`;
+  if(!anim){ [lossA, profA, qG, bG].forEach(e => e.classList.add('on')); return; }
+  await turnOn([revL, costL], 400); await sleep(1000); if(!ok()) return;
+  lossA.classList.add('on'); profA.classList.add('on'); await sleep(600); if(!ok()) return;
+  bG.classList.add('on'); await sleep(700); if(!ok()) return;
+  qG.classList.add('on');
+}
+$('#cv-play').addEventListener('click', () => cvpPlay(true));
+['cv-p','cv-v','cv-f','cv-q','cv-t'].forEach(id => $('#' + id).addEventListener('input', () => { clearTimeout(SCV.timer); SCV.timer = setTimeout(() => cvpPlay(false), 350); }));
+
+/* ===================== k6 全部原価 vs 直接原価 ===================== */
+const SAB = {run:0};
+async function abPlay(){
+  const token = ++SAB.run, ok = () => token === SAB.run;
+  const bar = (segs) => segs.map(s => `<div style="flex-grow:${s[0]};background:${s[2]}">${s[1]}</div>`).join('');
+  $('#ab-bar').innerHTML = bar([[300, '固定製造間接費 300,000', 'var(--e-exp)'], [0, '', 'var(--e-asset)']]);
+  $('#vc-bar').innerHTML = bar([[300, '固定製造間接費 300,000', 'var(--e-exp)']]);
+  const pl = rows => rows.map(r => `<div class="${r[2] || ''} off"><span>${r[0]}</span><b class="num">${r[1]}</b></div>`).join('');
+  $('#ab-pl').innerHTML = pl([['売上高（800個×@1,000）','800,000'],['売上原価（800個×@700）','560,000'],['売上総利益','240,000','sum'],['販売費及び一般管理費<br><small>変動販売費 40,000＋固定 100,000</small>','140,000'],['営業利益','100,000','sum']]);
+  $('#vc-pl').innerHTML = pl([['売上高（800個×@1,000）','800,000'],['変動売上原価（800個×@400）','320,000'],['変動販売費（800個×@50）','40,000'],['貢献利益','440,000','sum'],['固定費<br><small>製造間接費 300,000＋販管費 100,000</small>','400,000'],['営業利益','40,000','sum']]);
+  $('#ab-cap').textContent = '違いは、固定製造間接費 300,000 をどこに入れるか。';
+  await sleep(1300); if(!ok()) return;
+  const [s1, s2] = $$('#ab-bar > div');
+  s1.style.flexGrow = 240; s1.textContent = '売上原価へ 240,000';
+  s2.style.flexGrow = 60; s2.textContent = '製品へ 60,000';
+  $('#vc-bar > div').textContent = '全額その期の費用 300,000';
+  $('#ab-cap').textContent = '全部原価計算では1個あたり @300 として製品原価に含めるので、売れ残った200個分の 60,000 は資産（製品）として次期へ。直接原価計算では全額その期の費用。';
+  await sleep(2200); if(!ok()) return;
+  const a = $$('#ab-pl > div'), v = $$('#vc-pl > div');
+  for(let i=0;i<Math.max(a.length, v.length);i++){
+    if(a[i]) a[i].classList.remove('off'); if(v[i]) v[i].classList.remove('off');
+    await sleep(380); if(!ok()) return;
+  }
+  a[a.length - 1].classList.add('new'); v[v.length - 1].classList.add('new');
+  $('#ab-cap').textContent = '営業利益の差 100,000−40,000 ＝ 60,000 は、期末製品に含まれる固定製造間接費（200個×@300）と同じ額。';
+}
+$('#ab-play').addEventListener('click', abPlay);
+
+/* ===================== テスト ===================== */
+const POOL_C = ['現金','当座預金','普通預金','受取手形','売掛金','契約資産','電子記録債権','売買目的有価証券','満期保有目的債券','子会社株式','関連会社株式','その他有価証券','商品','繰越商品','未収入金','貯蔵品','仮払法人税等','繰延税金資産','建物','備品','車両運搬具','機械装置','建設仮勘定','リース資産','ソフトウェア','のれん','諸資産','仕掛品',
+  '支払手形','買掛金','未払金','未払配当金','契約負債','返金負債','リース債務','未払法人税等','繰延税金負債','賞与引当金','退職給付引当金','商品保証引当金','貸倒引当金','備品減価償却累計額','車両運搬具減価償却累計額','非支配株主持分','諸負債','支店','本店',
+  '資本金','資本準備金','利益準備金','繰越利益剰余金','その他有価証券評価差額金','利益剰余金','剰余金の配当',
+  '売上','売上高','役務収益','有価証券利息','受取配当金','有価証券売却益','有価証券評価損益','固定資産売却益','国庫補助金受贈益','為替差損益','法人税等調整額','負ののれん発生益',
+  '仕入','売上原価','役務原価','給料','旅費交通費','棚卸減耗損','商品評価損','減価償却費','ソフトウェア償却','のれん償却','研究開発費','支払利息','手形売却損','固定資産売却損','固定資産除却損','固定資産圧縮損','賞与引当金繰入','賞与','退職給付費用','貸倒引当金繰入','法人税等','非支配株主に帰属する当期純利益'];
+const POOL_K = ['現金','普通預金','買掛金','未払賃金','預り金','材料','仕掛品','製品','製造間接費','賃金','経費','売上','売上原価','売掛金','本社','工場',
+  '材料消費価格差異','賃率差異','製造間接費配賦差異','価格差異','数量差異','切削部門費','組立部門費','動力部門費','修繕部門費','外注加工賃','電力料'];
+
+const QJ = [
+ /* 商品売買・収益 */
+ {id:'c01',cat:'商品売買・収益',q:'商品300,000円を掛けで仕入れた。商品売買は売上原価対立法で記帳している。',dr:[['商品',300000]],cr:[['買掛金',300000]],alt:['仕入'],ex:'対立法では、仕入れた商品は「商品」（資産）で記録します。'},
+ {id:'c02',cat:'商品売買・収益',q:'原価240,000円の商品を360,000円で売り上げ、代金は掛けとした。売上原価対立法で記帳している。',dr:[['売掛金',360000],['売上原価',240000]],cr:[['売上',360000],['商品',240000]],alt:['仕入'],ex:'売上の計上と同時に、原価分を商品から売上原価へ振り替えます。'},
+ {id:'c03',cat:'商品売買・収益',q:'決算にあたり、商品の帳簿棚卸数量は200個（原価@1,000円）、実地棚卸数量は190個、正味売却価額は@950円であった。棚卸減耗損と商品評価損を計上する（いずれも繰越商品から減額）。',dr:[['棚卸減耗損',10000],['商品評価損',9500]],cr:[['繰越商品',19500]],alt:['売上原価'],ex:'減耗損 10個×1,000＝10,000。評価損（1,000−950）×190個＝9,500。'},
+ {id:'c04',cat:'商品売買・収益',q:'商品Xと商品Yを合計100,000円で販売する契約を結び、商品X（60,000円）を引き渡した。代金はYの引渡し後に請求する契約であり、XとYの引渡しはそれぞれ独立した履行義務である。',dr:[['契約資産',60000]],cr:[['売上',60000]],alt:['売掛金','契約負債'],ex:'売上は計上しますが、まだ請求できないので「契約資産」です。'},
+ {id:'c05',cat:'商品売買・収益',q:'商品の注文を受け、手付金50,000円が普通預金口座に振り込まれた。契約負債勘定で処理する。',dr:[['普通預金',50000]],cr:[['契約負債',50000]],alt:['契約資産','売上'],ex:'先に受け取った対価は「契約負債」（負債）。'},
+ {id:'c06',cat:'商品売買・収益',q:'商品500,000円を掛けで販売した。この取引先には、一定の取引量を超えた場合に3%のリベートを支払う契約があり、リベートの支払いが見込まれている。',dr:[['売掛金',500000]],cr:[['売上',485000],['返金負債',15000]],alt:['契約負債'],ex:'支払いが見込まれるリベート 500,000×3%＝15,000 は売上から除き「返金負債」にします。'},
+ {id:'c07',cat:'商品売買・収益',q:'旅行業を営む当社は、ツアーの添乗員に対する給料80,000円と交通費20,000円（いずれもすでに給料・旅費交通費で計上済み）を、サービス提供前のため仕掛品勘定に振り替えた。',dr:[['仕掛品',100000]],cr:[['給料',80000],['旅費交通費',20000]],alt:['役務原価'],ex:'提供前のサービスにかかった費用は「仕掛品」にためておきます。'},
+ {id:'c08',cat:'商品売買・収益',q:'上記のツアーを催行し、対価250,000円を現金で受け取った。あわせて仕掛品100,000円を役務原価に振り替えた。',dr:[['現金',250000],['役務原価',100000]],cr:[['役務収益',250000],['仕掛品',100000]],alt:['売上'],ex:'サービスの売上は「役務収益」、その原価は「役務原価」。'},
+ /* 有価証券 */
+ {id:'c09',cat:'有価証券',q:'売買目的でA社株式1,000株を@800円で購入し、買入手数料8,000円とともに代金は月末に支払うこととした。',dr:[['売買目的有価証券',808000]],cr:[['未払金',808000]],alt:['その他有価証券','買掛金'],ex:'手数料は取得原価に含めます。商品以外の後払いなので「未払金」。'},
+ {id:'c10',cat:'有価証券',q:'売買目的でB社社債（額面2,000,000円）を@98円で購入し、端数利息14,600円とともに普通預金口座から支払った。',dr:[['売買目的有価証券',1960000],['有価証券利息',14600]],cr:[['普通預金',1974600]],alt:['満期保有目的債券'],ex:'端数利息は有価証券利息の借方（マイナス）に記入します。'},
+ {id:'c11',cat:'有価証券',q:'売買目的で2回に分けて取得したC社株式（1回目300株@500円、2回目200株@550円）のうち400株を@600円で売却し、代金は月末に受け取ることとした。払出単価は平均原価法による。',dr:[['未収入金',240000]],cr:[['売買目的有価証券',208000],['有価証券売却益',32000]],alt:['有価証券評価損益','売掛金'],ex:'平均単価 260,000÷500株＝@520。帳簿価額 208,000、売却額 240,000。'},
+ {id:'c12',cat:'有価証券',q:'決算日に、売買目的有価証券（帳簿価額500,000円）を時価470,000円に評価替えした（切放法）。',dr:[['有価証券評価損益',30000]],cr:[['売買目的有価証券',30000]],alt:['有価証券売却益'],ex:'売買目的有価証券の評価差額は「有価証券評価損益」（P/L）。'},
+ {id:'c13',cat:'有価証券',q:'決算日に、その他有価証券（取得原価800,000円）の時価が850,000円であった。全部純資産直入法により評価替えを行う。税効果は考慮しない。',dr:[['その他有価証券',50000]],cr:[['その他有価証券評価差額金',50000]],alt:['有価証券評価損益'],ex:'その他有価証券の評価差額は純資産に直接計上します。'},
+ {id:'c14',cat:'有価証券',q:'決算日に、当期首に980,000円で取得した満期保有目的債券（額面1,000,000円、満期まで5年）について、償却原価法（定額法）を適用した。',dr:[['満期保有目的債券',4000]],cr:[['有価証券利息',4000]],ex:'（1,000,000−980,000）÷5年＝4,000。'},
+ {id:'c15',cat:'有価証券',q:'D社の発行済株式の60%を取得して支配を獲得し、代金3,000,000円を普通預金口座から支払った。',dr:[['子会社株式',3000000]],cr:[['普通預金',3000000]],alt:['関連会社株式','その他有価証券'],ex:'過半数を取得して支配したので「子会社株式」。'},
+ /* 固定資産 */
+ {id:'c16',cat:'固定資産',q:'前期首に取得した備品（取得原価800,000円、耐用年数8年）について、200%定率法（償却率0.25）により当期（2年目）の減価償却を行う（間接法）。',dr:[['減価償却費',150000]],cr:[['備品減価償却累計額',150000]],ex:'1年目 200,000。2年目（800,000−200,000）×0.25＝150,000。'},
+ {id:'c17',cat:'固定資産',q:'旧車両（取得原価1,500,000円、減価償却累計額900,000円）を下取りに出し、新車両2,000,000円を購入した。下取価額は500,000円で、差額は月末に支払う（期首の取引とする）。',dr:[['車両運搬具',2000000],['車両運搬具減価償却累計額',900000],['固定資産売却損',100000]],cr:[['車両運搬具',1500000],['未払金',1500000]],alt:['固定資産売却益'],ex:'帳簿価額 600,000 を 500,000 で手放したので売却損 100,000。'},
+ {id:'c18',cat:'固定資産',q:'期首に備品（取得原価400,000円、減価償却累計額300,000円）を除却した。この備品の処分価値は20,000円と見積もられた。',dr:[['備品減価償却累計額',300000],['貯蔵品',20000],['固定資産除却損',80000]],cr:[['備品',400000]],alt:['固定資産売却損'],ex:'処分価値は「貯蔵品」。帳簿価額 100,000 との差 80,000 が除却損。'},
+ {id:'c19',cat:'固定資産',q:'機械装置の購入に先立ち、国から補助金600,000円を受け取り、普通預金口座に入金された。',dr:[['普通預金',600000]],cr:[['国庫補助金受贈益',600000]],ex:'補助金は収益「国庫補助金受贈益」。'},
+ {id:'c20',cat:'固定資産',q:'上記の補助金を使って機械装置1,500,000円を取得した（代金は支払済み）。補助金相当額について直接減額方式で圧縮記帳を行う。',dr:[['固定資産圧縮損',600000]],cr:[['機械装置',600000]],ex:'圧縮損を計上し、機械装置の帳簿価額を直接減らします。'},
+ {id:'c21',cat:'固定資産',q:'ファイナンス・リース取引により備品のリースを開始した。年間リース料は200,000円、期間は5年で、利子込み法で処理する。',dr:[['リース資産',1000000]],cr:[['リース債務',1000000]],ex:'利子込み法ではリース料総額 200,000×5＝1,000,000。'},
+ {id:'c22',cat:'固定資産',q:'利子抜き法（見積現金購入価額900,000円、年間リース料200,000円、期間5年）で処理しているリースについて、1回目のリース料を普通預金口座から支払った。利息は定額法で配分する。',dr:[['リース債務',180000],['支払利息',20000]],cr:[['普通預金',200000]],alt:['リース資産'],ex:'利息総額 100,000÷5年＝20,000。残り 180,000 が債務の返済。'},
+ {id:'c23',cat:'固定資産',q:'決算日に、当期首に600,000円で取得した自社利用のソフトウェアを5年間で定額法により償却した。',dr:[['ソフトウェア償却',120000]],cr:[['ソフトウェア',120000]],alt:['減価償却費'],ex:'600,000÷5年＝120,000。無形固定資産は直接減らします。'},
+ {id:'c24',cat:'固定資産',q:'建設中の建物が完成し、引渡しを受けた。工事代金8,000,000円のうち5,000,000円は前払いしており、残額を普通預金口座から支払った。',dr:[['建物',8000000]],cr:[['建設仮勘定',5000000],['普通預金',3000000]],ex:'前払い分は「建設仮勘定」から建物へ振り替えます。'},
+ {id:'c25',cat:'固定資産',q:'研究開発に従事する従業員の給料200,000円と、研究開発専用の機器300,000円の代金を普通預金口座から支払った。',dr:[['研究開発費',500000]],cr:[['普通預金',500000]],alt:['給料','備品'],ex:'研究開発のための支出は、機器も含めてすべて「研究開発費」（費用）。'},
+ /* 外貨・税効果 */
+ {id:'c26',cat:'外貨・税効果',q:'商品$2,000を掛けで輸入した。取引日の為替レートは1ドル108円である（三分法）。',dr:[['仕入',216000]],cr:[['買掛金',216000]],ex:'$2,000×108円＝216,000。'},
+ {id:'c27',cat:'外貨・税効果',q:'上記の買掛金$2,000を普通預金口座から支払った。決済日の為替レートは1ドル112円である。',dr:[['買掛金',216000],['為替差損益',8000]],cr:[['普通預金',224000]],ex:'支払額 224,000 が帳簿の 216,000 より 8,000 多いので為替差損。'},
+ {id:'c28',cat:'外貨・税効果',q:'決算日に、売掛金$3,000（取引日レート1ドル110円で換算済み）を決算日レート1ドル105円で換算替えした。',dr:[['為替差損益',15000]],cr:[['売掛金',15000]],ex:'330,000 → 315,000 に減るので為替差損 15,000。'},
+ {id:'c29',cat:'外貨・税効果',q:'決算にあたり、貸倒引当金繰入額のうち40,000円が損金不算入となった。法人税等の実効税率は30%として税効果会計を適用する。',dr:[['繰延税金資産',12000]],cr:[['法人税等調整額',12000]],alt:['繰延税金負債'],ex:'40,000×30%＝12,000。'},
+ {id:'c30',cat:'外貨・税効果',q:'その他有価証券（取得原価600,000円）を時価700,000円に評価替えする。全部純資産直入法により、実効税率30%で税効果会計を適用する。',dr:[['その他有価証券',100000]],cr:[['繰延税金負債',30000],['その他有価証券評価差額金',70000]],alt:['法人税等調整額','繰延税金資産'],ex:'評価益 100,000 のうち税金分 30,000 は繰延税金負債。P/Lを通らないので法人税等調整額は使いません。'},
+ /* 引当金・純資産 */
+ {id:'c31',cat:'引当金・純資産',q:'決算にあたり、次期に支給する賞与のうち当期負担分300,000円を引当金として計上した。',dr:[['賞与引当金繰入',300000]],cr:[['賞与引当金',300000]],ex:'当期の勤務に対応する分を費用にします。'},
+ {id:'c32',cat:'引当金・純資産',q:'賞与500,000円を普通預金口座から支給した。前期末に賞与引当金300,000円を計上している。',dr:[['賞与引当金',300000],['賞与',200000]],cr:[['普通預金',500000]],alt:['賞与引当金繰入'],ex:'引当金を取り崩し、足りない分は当期の費用「賞与」。'},
+ {id:'c33',cat:'引当金・純資産',q:'決算にあたり、退職給付引当金400,000円を繰り入れた。',dr:[['退職給付費用',400000]],cr:[['退職給付引当金',400000]],ex:'費用の科目は「退職給付費用」。'},
+ {id:'c34',cat:'引当金・純資産',q:'前期に販売した商品について無料修理の請求があり、修理費30,000円を現金で支払った。商品保証引当金の残高は50,000円である。',dr:[['商品保証引当金',30000]],cr:[['現金',30000]],ex:'前期販売分の修理なので引当金を取り崩します。'},
+ {id:'c35',cat:'引当金・純資産',q:'株主総会で、繰越利益剰余金を財源とする配当2,000,000円と、会社法が定める額の利益準備金の積立てが決議された。決議時の資本金は30,000,000円、資本準備金は4,000,000円、利益準備金は3,000,000円である。',dr:[['繰越利益剰余金',2200000]],cr:[['未払配当金',2000000],['利益準備金',200000]],alt:['資本準備金'],ex:'上限まで 7,500,000−7,000,000＝500,000 の余裕あり。配当の1/10＝200,000 を積み立てます。'},
+ {id:'c36',cat:'引当金・純資産',q:'増資のため株式500株を1株60,000円で発行し、全額が普通預金口座に払い込まれた。資本金には会社法が定める最低限度額を計上する。',dr:[['普通預金',30000000]],cr:[['資本金',15000000],['資本準備金',15000000]],alt:['利益準備金'],ex:'払込額の1/2を資本金、残りを資本準備金。'},
+ {id:'c37',cat:'引当金・純資産',q:'A社を吸収合併し、同社の諸資産5,000,000円と諸負債3,000,000円を引き継いだ。対価として新株を発行し（時価2,500,000円）、全額を資本金とした。',dr:[['諸資産',5000000],['のれん',500000]],cr:[['諸負債',3000000],['資本金',2500000]],alt:['負ののれん発生益'],ex:'純資産 2,000,000 に対し 2,500,000 を交付したので、差額 500,000 は「のれん」。'},
+ /* 本支店・連結 */
+ {id:'c38',cat:'本支店・連結',q:'本店は、支店へ商品100,000円（原価）を送付した。本店の仕訳を答えなさい。',dr:[['支店',100000]],cr:[['仕入',100000]],alt:['本店','売上'],ex:'本店側は「支店」勘定を使い、送った商品の原価だけ仕入を減らします。'},
+ {id:'c39',cat:'本支店・連結',q:'支店は、本店の買掛金70,000円を現金で支払った。支店の仕訳を答えなさい。',dr:[['本店',70000]],cr:[['現金',70000]],alt:['支店','買掛金'],ex:'支店側は「本店」勘定を使います。'},
+ {id:'c40',cat:'本支店・連結',q:'P社はS社の発行済株式の70%を3,000,000円で取得し支配を獲得した。支配獲得日のS社の純資産は資本金3,000,000円、利益剰余金1,000,000円である。投資と資本の相殺消去仕訳を答えなさい。',dr:[['資本金',3000000],['利益剰余金',1000000],['のれん',200000]],cr:[['子会社株式',3000000],['非支配株主持分',1200000]],alt:['負ののれん発生益'],ex:'P社持分 4,000,000×70%＝2,800,000。のれん 200,000、非支配 1,200,000。'},
+ {id:'c41',cat:'本支店・連結',q:'連結子会社S社の当期純利益は600,000円である。非支配株主の持分比率は30%である。',dr:[['非支配株主に帰属する当期純利益',180000]],cr:[['非支配株主持分',180000]],ex:'600,000×30%＝180,000。'},
+ {id:'c42',cat:'本支店・連結',q:'親会社P社は子会社S社に売上総利益率25%で商品を販売している。S社の期末商品のうちP社から仕入れた分は80,000円である。未実現利益を消去する。',dr:[['売上原価',20000]],cr:[['商品',20000]],ex:'売価に対する利益率なので 80,000×25%＝20,000。'},
+ {id:'c43',cat:'本支店・連結',q:'P社の子会社S社に対する売上高は500,000円であった。連結上、内部取引を相殺消去する。',dr:[['売上高',500000]],cr:[['売上原価',500000]],alt:['売上','仕入'],ex:'連結P/Lの科目「売上高」と「売上原価」を相殺します。'},
+ {id:'c44',cat:'本支店・連結',q:'S社の支払った配当金20,000円のうち、16,000円は親会社P社に、4,000円は非支配株主に支払われたものである。',dr:[['受取配当金',16000],['非支配株主持分',4000]],cr:[['剰余金の配当',20000]],ex:'グループ内の配当は消去し、非支配株主への分は持分を減らします。'},
+ /* 工業簿記 */
+ {id:'k01',cat:'工業簿記',pool:'K',q:'素材1,000kgを@300円で掛けで購入し、引取運賃10,000円は現金で支払った。',dr:[['材料',310000]],cr:[['買掛金',300000],['現金',10000]],ex:'材料副費は購入原価に含めます。'},
+ {id:'k02',cat:'工業簿記',pool:'K',q:'素材800kgを消費した（消費単価@310円）。うち700kgは直接材料、100kgは間接材料である。',dr:[['仕掛品',217000],['製造間接費',31000]],cr:[['材料',248000]],ex:'直接 700×310＝217,000、間接 100×310＝31,000。'},
+ {id:'k03',cat:'工業簿記',pool:'K',q:'当月の材料の予定消費額は400,000円、実際消費額は412,000円であった。差額を材料消費価格差異勘定に振り替える。',dr:[['材料消費価格差異',12000]],cr:[['材料',12000]],ex:'実際が多い → 借方差異。材料勘定の貸方に追加します。'},
+ {id:'k04',cat:'工業簿記',pool:'K',q:'賃金600,000円の支給にあたり、源泉所得税など50,000円を差し引き、残額を普通預金口座から支払った。',dr:[['賃金',600000]],cr:[['預り金',50000],['普通預金',550000]],ex:'差し引いた分は「預り金」。'},
+ {id:'k05',cat:'工業簿記',pool:'K',q:'直接工が直接作業400時間、間接作業50時間を行った。予定賃率は@1,200円である。',dr:[['仕掛品',480000],['製造間接費',60000]],cr:[['賃金',540000]],ex:'直接 400×1,200、間接 50×1,200。'},
+ {id:'k06',cat:'工業簿記',pool:'K',q:'当月の賃金の予定消費額は540,000円、実際消費額は555,000円であった。差額を賃率差異勘定に振り替える。',dr:[['賃率差異',15000]],cr:[['賃金',15000]],ex:'実際が多い → 借方差異（不利）。'},
+ {id:'k07',cat:'工業簿記',pool:'K',q:'当月の経費のうち、外注加工賃80,000円は直接経費、工場の電力料50,000円は間接経費として消費した。経費勘定から振り替える。',dr:[['仕掛品',80000],['製造間接費',50000]],cr:[['経費',130000]],alt:['外注加工賃','電力料'],ex:'直接経費は仕掛品へ、間接経費は製造間接費へ。'},
+ {id:'k08',cat:'工業簿記',pool:'K',q:'製造間接費を予定配賦率@800円/時間で配賦した。当月の実際直接作業時間は900時間である。',dr:[['仕掛品',720000]],cr:[['製造間接費',720000]],ex:'800×900＝720,000。'},
+ {id:'k09',cat:'工業簿記',pool:'K',q:'製造間接費の予定配賦額は720,000円、実際発生額は790,000円であった。差額を製造間接費配賦差異勘定に振り替える。',dr:[['製造間接費配賦差異',70000]],cr:[['製造間接費',70000]],ex:'実際が多い → 借方差異（不利）。'},
+ {id:'k10',cat:'工業簿記',pool:'K',q:'製品1,200,000円が完成した。',dr:[['製品',1200000]],cr:[['仕掛品',1200000]],ex:'完成品原価は仕掛品から製品へ。'},
+ {id:'k11',cat:'工業簿記',pool:'K',q:'製品（製造原価900,000円）を1,300,000円で掛けで販売した。',dr:[['売掛金',1300000],['売上原価',900000]],cr:[['売上',1300000],['製品',900000]],ex:'販売時に製品を売上原価へ振り替えます。'},
+ {id:'k12',cat:'工業簿記',pool:'K',q:'本社工場会計を採用している。本社が材料200,000円を掛けで購入し、工場の倉庫に受け入れた。工場の仕訳を答えなさい（工場には材料勘定と本社勘定を設けている）。',dr:[['材料',200000]],cr:[['本社',200000]],alt:['工場','買掛金'],ex:'買掛金は本社の帳簿にあるので、工場は相手勘定を「本社」にします。'},
+ {id:'k13',cat:'工業簿記',pool:'K',q:'パーシャル・プランの標準原価計算で、仕掛品勘定において直接材料費の価格差異13,000円（不利）と数量差異10,000円（不利）を把握し、各差異勘定に振り替えた。',dr:[['価格差異',13000],['数量差異',10000]],cr:[['仕掛品',23000]],alt:['材料'],ex:'パーシャル・プランでは差異は仕掛品勘定で発生します。不利差異は借方。'},
+ {id:'k14',cat:'工業簿記',pool:'K',q:'動力部門費120,000円を、直接配賦法により切削部に75,000円、組立部に45,000円配賦した。',dr:[['切削部門費',75000],['組立部門費',45000]],cr:[['動力部門費',120000]],ex:'補助部門費を製造部門費へ振り替えます。'},
+ {id:'k15',cat:'工業簿記',pool:'K',q:'月末に、当月分の賃金の未払高90,000円を計上した。',dr:[['賃金',90000]],cr:[['未払賃金',90000]],ex:'未払分を賃金勘定の借方に加え、当月の消費額に含めます。'}
+];
+const QC = [
+ {id:'q01',cat:'計算（商業）',q:'商品の帳簿棚卸数量500個（原価@400円）、実地棚卸数量480個、正味売却価額@370円のとき、商品評価損はいくらか。',a:14400,u:'円',ex:'（400−370）×480個＝14,400'},
+ {id:'q02',cat:'計算（商業）',q:'取得原価1,000,000円、耐用年数5年の機械を200%定率法（償却率0.4）で償却する。2年目の減価償却費はいくらか。',a:240000,u:'円',ex:'1年目 400,000。2年目（1,000,000−400,000）×0.4＝240,000'},
+ {id:'q03',cat:'計算（商業）',q:'額面2,000,000円の社債を当期首に1,940,000円で取得し、満期保有目的債券とした（満期まで4年、償却原価法・定額法）。1年目の期末の帳簿価額はいくらか。',a:1955000,u:'円',ex:'差額 60,000÷4年＝15,000。1,940,000＋15,000＝1,955,000'},
+ {id:'q04',cat:'計算（商業）',q:'額面1,000,000円、年利7.3%の社債を、前回の利払日の翌日から50日目に購入した。端数利息はいくらか（1年は365日）。',a:10000,u:'円',ex:'1,000,000×7.3%×50/365＝10,000'},
+ {id:'q05',cat:'計算（商業）',q:'資本金20,000,000円、資本準備金3,000,000円、利益準備金1,800,000円の会社が、繰越利益剰余金から1,500,000円を配当する。積み立てる利益準備金はいくらか。',a:150000,u:'円',ex:'上限まで 5,000,000−4,800,000＝200,000。1/10＝150,000 のほうが少ない。'},
+ {id:'q06',cat:'計算（商業）',q:'P社はS社株式の80%を5,000,000円で取得した。S社の純資産は資本金4,000,000円、利益剰余金1,500,000円である。のれんはいくらか。',a:600000,u:'円',ex:'5,500,000×80%＝4,400,000。5,000,000−4,400,000＝600,000'},
+ {id:'q07',cat:'計算（商業）',q:'前問の条件で、支配獲得日の非支配株主持分はいくらか。',a:1100000,u:'円',ex:'5,500,000×20%＝1,100,000'},
+ {id:'q08',cat:'計算（商業）',q:'売掛金$5,000（取引日レート1ドル110円）が、1ドル114円の日に決済された。為替差損益（差益）はいくらか。',a:20000,u:'円',ex:'$5,000×（114−110）＝20,000 の差益'},
+ {id:'q09',cat:'計算（商業）',q:'減価償却費のうち損金算入限度超過額が50,000円あった。実効税率30%のとき、計上する繰延税金資産はいくらか。',a:15000,u:'円',ex:'50,000×30%＝15,000'},
+ {id:'q10',cat:'計算（工業）',q:'当月の賃金支払高500,000円、前月未払高80,000円、当月未払高90,000円のとき、当月の賃金消費額はいくらか。',a:510000,u:'円',ex:'500,000−80,000＋90,000＝510,000'},
+ {id:'q11',cat:'計算（工業）',q:'月初在庫100kg（@200円）、当月購入400kg（@230円）。当月300kgを消費した。先入先出法による材料消費額はいくらか。',a:66000,u:'円',ex:'100×200＋200×230＝66,000'},
+ {id:'q12',cat:'計算（工業）',q:'第四章のボックス図の条件（月初仕掛品200個・材料費34,000円・加工費24,600円・進捗度50%、当月投入1,000個・材料費230,000円・加工費294,000円、完成品1,000個、月末仕掛品200個・進捗度40%、材料は始点投入）で、平均法による月末仕掛品原価はいくらか。',a:67600,u:'円',ex:'材料 264,000÷1,200×200＝44,000、加工費 318,600÷1,080×80＝23,600'},
+ {id:'q13',cat:'計算（工業）',q:'前問と同じ条件で、先入先出法による完成品総合原価はいくらか。',a:512600,u:'円',ex:'月末＝材料 230,000÷1,000×200＝46,000、加工費 294,000÷980×80＝24,000。582,600−70,000＝512,600'},
+ {id:'q14',cat:'計算（工業）',q:'公式法変動予算：変動費率@300円、固定費予算500,000円、基準操業度1,000時間。実際操業度900時間、実際発生額790,000円のとき、予算差異はいくらの不利差異か。',a:20000,u:'円',ex:'予算許容額 300×900＋500,000＝770,000。770,000−790,000＝−20,000（不利）'},
+ {id:'q15',cat:'計算（工業）',q:'前問と同じ条件で、操業度差異はいくらの不利差異か。',a:50000,u:'円',ex:'固定費率 500,000÷1,000＝@500。500×（900−1,000）＝−50,000（不利）'},
+ {id:'q16',cat:'計算（工業）',q:'直接材料の標準価格@100円、実際価格@105円、実際消費量2,600kgのとき、価格差異はいくらの不利差異か。',a:13000,u:'円',ex:'（100−105）×2,600＝−13,000（不利）'},
+ {id:'q17',cat:'計算（工業）',q:'標準賃率@1,200円、標準作業時間1,000時間、実際作業時間1,050時間のとき、作業時間差異はいくらの不利差異か。',a:60000,u:'円',ex:'1,200×（1,000−1,050）＝−60,000（不利）'},
+ {id:'q18',cat:'計算（工業）',q:'販売単価1,000円、単位あたり変動費600円、固定費2,000,000円のとき、損益分岐点売上高はいくらか。',a:5000000,u:'円',ex:'貢献利益率 40%。2,000,000÷0.4＝5,000,000'},
+ {id:'q19',cat:'計算（工業）',q:'前問の条件で、営業利益400,000円を達成するための販売量は何個か。',a:6000,u:'個',ex:'（2,000,000＋400,000）÷400＝6,000個'},
+ {id:'q20',cat:'計算（工業）',q:'当月1,000個を生産し800個を販売した（月初在庫なし）。固定製造間接費は300,000円である。全部原価計算の営業利益は、直接原価計算の営業利益よりいくら多いか。',a:60000,u:'円',ex:'期末製品200個 × @300＝60,000 が全部原価計算では資産に繰り越される。'},
+ {id:'q21',cat:'計算（工業）',q:'第三章の部門費配賦の条件で、相互配賦法（簡便法）による切削部の製造部門費の合計はいくらか。',a:514000,u:'円',ex:'400,000＋60,000＋32,000＋10,000＋12,000＝514,000'}
+];
+const ALLQ = [...QJ.map(q => Object.assign({type:'j'}, q)), ...QC.map(q => Object.assign({type:'c'}, q))];
+const QCATS = ['商品売買・収益','有価証券','固定資産','外貨・税効果','引当金・純資産','本支店・連結','工業簿記','計算（商業）','計算（工業）'];
+const KEY = 'boki2-keikocho-v1';
+function loadRec(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
+function saveRec(){ try{ localStorage.setItem(KEY, JSON.stringify(REC)); }catch(e){} }
+let REC = loadRec();
+function hashStr(s){ let h = 2166136261; for(const ch of s){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed){ return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function shuffle(arr, r = Math.random){ const a = arr.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const OPT_CACHE = {};
+function optionsFor(q){
+  if(OPT_CACHE[q.id]) return OPT_CACHE[q.id];
+  const pool = q.pool === 'K' ? POOL_K : POOL_C;
+  const set = new Set([...q.dr.map(l => l[0]), ...q.cr.map(l => l[0]), ...(q.alt || [])]);
+  const r = rng(hashStr(q.id));
+  for(const a of shuffle(pool, r)){ if(set.size >= 10) break; set.add(a); }
+  const order = a => { const i = pool.indexOf(a); return i < 0 ? 999 : i; };
+  return OPT_CACHE[q.id] = [...set].sort((a, b) => order(a) - order(b));
+}
+$('#t-scope').innerHTML = `<option value="all">すべて（${ALLQ.length}問）</option>` +
+  `<option value="shogyo">商業簿記の仕訳（${QJ.filter(q => q.pool !== 'K').length}問）</option><option value="kogyo">工業簿記の仕訳（${QJ.filter(q => q.pool === 'K').length}問）</option>` +
+  QCATS.map(c => `<option value="${c}">${c}（${ALLQ.filter(q => q.cat === c).length}問）</option>`).join('') +
+  `<option value="wrong">前回まちがえた問題</option><option value="new">まだ解いていない問題</option>`;
+function renderStats(){
+  $('#t-stats').innerHTML = QCATS.map(c => {
+    const qs = ALLQ.filter(q => q.cat === c), ok = qs.filter(q => REC[q.id] && REC[q.id].ok).length;
+    return `<div class="stat"><span>${c}</span><span class="track"><span class="fill" style="width:${ok/qs.length*100}%"></span></span><span class="v num">${ok}/${qs.length}</span></div>`;
+  }).join('');
+}
+renderStats();
+const T = {list:[], i:0, res:[], graded:false};
+$('#t-start').addEventListener('click', () => {
+  const scope = $('#t-scope').value, n = +$('#t-count').value;
+  let pool = ALLQ;
+  if(scope === 'wrong') pool = ALLQ.filter(q => REC[q.id] && !REC[q.id].ok);
+  else if(scope === 'new') pool = ALLQ.filter(q => !REC[q.id]);
+  else if(scope === 'shogyo') pool = ALLQ.filter(q => q.type === 'j' && q.pool !== 'K');
+  else if(scope === 'kogyo') pool = ALLQ.filter(q => q.type === 'j' && q.pool === 'K');
+  else if(scope !== 'all') pool = ALLQ.filter(q => q.cat === scope);
+  if(!pool.length){ $('#t-err').textContent = scope === 'wrong' ? 'まちがえた問題はありません。別の範囲を選んでください。' : '該当する問題がありません。別の範囲を選んでください。'; return; }
+  $('#t-err').textContent = '';
+  startSession(shuffle(pool).slice(0, n));
+});
+$('#t-clear').addEventListener('click', () => { $('#t-clear-confirm').hidden = false; });
+$('#t-clear-no').addEventListener('click', () => { $('#t-clear-confirm').hidden = true; });
+$('#t-clear-yes').addEventListener('click', () => { REC = {}; saveRec(); renderStats(); $('#t-clear-confirm').hidden = true; });
+function startSession(list){ T.list = list; T.i = 0; T.res = []; $('#t-menu').hidden = true; $('#t-run').hidden = false; renderQ(); }
+function backToMenu(){ $('#t-run').hidden = true; $('#t-menu').hidden = false; renderStats(); }
+function renderQ(){
+  const q = T.list[T.i]; T.graded = false;
+  const total = T.list.length;
+  let body = '';
+  if(q.type === 'j'){
+    const opts = optionsFor(q);
+    const sel = (s, r) => `<select id="q-${s}-a-${r}" aria-label="${s==='dr'?'借方':'貸方'}科目 ${r+1}行目"><option value="">―</option>${opts.map(o => `<option>${esc(o)}</option>`).join('')}</select>`;
+    const inp = (s, r) => `<input id="q-${s}-n-${r}" inputmode="numeric" autocomplete="off" aria-label="${s==='dr'?'借方':'貸方'}金額 ${r+1}行目">`;
+    const side = s => `<div class="je-side ${s}"><div class="je-h"><span>${s==='dr'?'借方科目':'貸方科目'}</span><span style="text-align:right">金額</span><span></span></div>${[0,1,2,3].map(r => `<div class="je-row">${sel(s,r)}${inp(s,r)}<span class="mk" id="mk-${s}-${r}"></span></div>`).join('')}</div>`;
+    body = `<div class="je">${side('dr')}${side('cr')}</div><p class="q-hint">勘定科目は選択肢の中から最も適当なものを選んでください。金額はカンマなしでも入力できます。</p>`;
+  }else{
+    body = `<div class="calc-in"><input id="q-calc" inputmode="numeric" autocomplete="off" aria-label="答え"><span>${q.u}</span></div>`;
+  }
+  $('#t-run').innerHTML = `<form class="q-card" id="q-form" novalidate>
+    <div class="q-meta"><span>問 ${T.i+1} / ${total}　・　${q.cat}</span><span>${q.type === 'j' ? '仕訳' : '計算'}</span></div>
+    <div class="q-progress"><div style="width:${T.i/total*100}%"></div></div>
+    <p class="q-text">${esc(q.q)}</p>
+    ${body}
+    <p class="err" id="q-err"></p>
+    <div class="controls">
+      <button class="btn" type="submit" id="q-submit">採点する</button>
+      <button class="btn ghost" type="button" id="q-reveal">答えを見る</button>
+      <button class="btn ghost" type="button" id="q-quit" style="margin-left:auto">中断してメニューへ</button>
+    </div>
+    <div id="q-result"></div>
+  </form>`;
+  fmtInputs($('#t-run'));
+  $('#q-form').addEventListener('submit', e => { e.preventDefault(); if(T.graded) nextQ(); else grade(false); });
+  $('#q-reveal').addEventListener('click', () => { if(!T.graded) grade(true); });
+  $('#q-quit').addEventListener('click', () => { if(T.res.length) finish(); else backToMenu(); });
+  const first = $('#t-run select, #t-run input'); if(first) first.focus({preventScroll:true});
+}
+function sideMap(side){
+  const m = new Map(); let err = null;
+  for(let r=0;r<4;r++){
+    const a = $(`#q-${side}-a-${r}`).value, raw = $(`#q-${side}-n-${r}`).value.trim();
+    if(!a && !raw) continue;
+    if(!a || !raw){ err = '科目と金額は同じ行にセットで入力してください。'; continue; }
+    const n = parseAmt(raw);
+    if(n == null){ err = '金額は数字で入力してください。'; continue; }
+    m.set(a, (m.get(a) || 0) + n);
+  }
+  return {m, err};
+}
+function expMap(lines){ const m = new Map(); lines.forEach(([a, n]) => m.set(a, (m.get(a) || 0) + n)); return m; }
+function sameMap(a, b){ if(a.size !== b.size) return false; for(const [k, v] of a) if(b.get(k) !== v) return false; return true; }
+function grade(reveal){
+  const q = T.list[T.i];
+  let correct = false;
+  if(q.type === 'j'){
+    const d = sideMap('dr'), c = sideMap('cr');
+    if(!reveal){
+      if(d.err || c.err){ $('#q-err').textContent = d.err || c.err; return; }
+      if(!d.m.size && !c.m.size){ $('#q-err').textContent = '解答を入力してから採点してください。わからないときは「答えを見る」を押してください。'; return; }
+    }
+    const ed = expMap(q.dr), ec = expMap(q.cr);
+    correct = !reveal && sameMap(d.m, ed) && sameMap(c.m, ec);
+    for(const [s, em, got] of [['dr', ed, d], ['cr', ec, c]]){
+      for(let r=0;r<4;r++){
+        const a = $(`#q-${s}-a-${r}`).value, mk = $(`#mk-${s}-${r}`);
+        if(!a){ mk.textContent = ''; continue; }
+        const good = em.has(a) && got.m.get(a) === em.get(a);
+        mk.textContent = good ? '○' : '×'; mk.className = 'mk ' + (good ? 'ok' : 'ng');
+      }
+    }
+  }else{
+    const v = parseAmt($('#q-calc').value);
+    if(!reveal && v == null){ $('#q-err').textContent = '答えを数字で入力してください。'; return; }
+    correct = !reveal && v === q.a;
+  }
+  $('#q-err').textContent = '';
+  T.graded = true;
+  T.res.push({q, ok: correct});
+  REC[q.id] = {ok: correct, n: ((REC[q.id] && REC[q.id].n) || 0) + 1};
+  saveRec();
+  $$('#t-run select, #t-run input').forEach(el => el.disabled = true);
+  $('#q-reveal').hidden = true;
+  $('#q-submit').textContent = T.i < T.list.length - 1 ? '次の問題へ' : '結果を見る';
+  const ans = q.type === 'j' ? `<div class="scroll-x">${journalTable(q.dr, q.cr)}</div>` : `<p>正解：<b class="num" style="font-size:18px">${yen(q.a)}</b> ${q.u}</p>`;
+  $('#q-result').innerHTML = `<div class="result"><span class="big ${correct ? 'ok' : 'ng'}">${correct ? '○ 正解' : reveal ? '答え' : '× 不正解'}</span>${ans}<p class="note">${esc(q.ex)}</p></div>`;
+  $('#q-submit').focus({preventScroll:true});
+  $('#q-result').scrollIntoView({behavior: RM ? 'auto' : 'smooth', block:'nearest'});
+}
+function nextQ(){
+  if(T.i < T.list.length - 1){ T.i++; renderQ(); $('#t-run').scrollIntoView({behavior: RM ? 'auto' : 'smooth', block:'start'}); }
+  else finish();
+}
+function finish(){
+  const n = T.res.length, ok = T.res.filter(r => r.ok).length, pct = n ? Math.round(ok / n * 100) : 0;
+  const wrong = T.res.filter(r => !r.ok).map(r => r.q);
+  $('#t-run').innerHTML = `<div class="final">
+    <span class="note">今回の結果</span>
+    <span class="score num">${ok} / ${n}<span style="font-size:20px;color:var(--ink-2)">　正答率 ${pct}%</span></span>
+    <p>${pct >= 70 ? '合格基準の70%に届く水準です。まちがえた問題を各章の図で確認しておきましょう。' : '合格基準の70%を目標に、まちがえた問題の章をもう一度再生して復習しましょう。'}</p>
+    <ul>${T.res.map(r => `<li><span class="mk ${r.ok?'ok':'ng'}">${r.ok?'○':'×'}</span><span>${esc(r.q.q.length > 56 ? r.q.q.slice(0, 56) + '…' : r.q.q)}</span></li>`).join('')}</ul>
+    <div class="controls">${wrong.length ? '<button class="btn" id="f-retry">まちがえた問題をもう一度</button>' : ''}<button class="btn ghost" id="f-menu">メニューへ戻る</button></div>
+  </div>`;
+  if(wrong.length) $('#f-retry').addEventListener('click', () => startSession(shuffle(wrong)));
+  $('#f-menu').addEventListener('click', backToMenu);
+}
+
+/* ===================== boot ===================== */
+const h0 = (location.hash || '').replace('#', '');
+showCh(ALLCH.includes(h0) ? h0 : 'c0', false);
+window.addEventListener('hashchange', () => { const h = location.hash.replace('#', ''); if(ALLCH.includes(h)) showCh(h, false); });
+
+})();
+</script>
+</body>
+</html>
